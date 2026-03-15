@@ -12,6 +12,13 @@
     delta
     ripgrep
     fd
+    bat
+    eza
+    lazygit
+    gh
+    git
+    yazi
+    tree
   ];
 
   programs.tmux = {
