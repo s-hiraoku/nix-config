@@ -106,14 +106,15 @@
     '';
   };
 
-  # Ghostty設定（~/.config/ghostty/config に配置される）
-  xdg.configFile."ghostty/config".text = ''
-    # シェル統合：タイトル制御は無効（tmux側で管理）
-    shell-integration-features = no-title
-
-    # 新タブで作業ディレクトリを引き継ぐ
-    window-inherit-working-directory = true
-  '';
+  programs.ghostty = {
+    enable = true;
+    package = null;  # macOSではApp Storeからインストール済み
+    enableZshIntegration = true;
+    settings = {
+      shell-integration-features = "no-title";
+      window-inherit-working-directory = true;
+    };
+  };
 
   programs.home-manager.enable = true;
 }
