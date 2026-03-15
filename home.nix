@@ -106,6 +106,11 @@
     '';
   };
 
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;  # $EDITOR=nvim
+  };
+
   programs.ghostty = {
     enable = true;
     package = null;  # macOSではApp Storeからインストール済み
