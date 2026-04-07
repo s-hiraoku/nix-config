@@ -26,8 +26,8 @@
     historyLimit = 50000;
     baseIndex = 1;
     mouse = true;
-    keyMode = "vi";
     prefix = "C-a";
+    keyMode = "vi";
 
     extraConfig = ''
       # True Color対応
