@@ -2,7 +2,6 @@
   description = "Home Manager configuration of hiraoku.shinichi";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -19,13 +18,18 @@
     {
       homeConfigurations."hiraoku.shinichi" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        modules = [
+          ./modules/common.nix
+          ./modules/personal.nix
+        ];
+      };
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-        modules = [ ./home.nix ];
-
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
+      homeConfigurations."hiraoku.shinichi@work" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [
+          ./modules/common.nix
+          ./modules/work.nix
+        ];
       };
     };
 }
