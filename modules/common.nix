@@ -3,6 +3,15 @@
 {
   home.stateVersion = "25.11";
 
+  home.shellAliases = {
+    vim = "nvim";
+  };
+
+  home.file.".local/bin/load-secrets" = {
+    source = ./scripts/load-secrets.sh;
+    executable = true;
+  };
+
   home.packages = with pkgs; [
     fzf
     zoxide
@@ -15,6 +24,8 @@
     gh
     yazi
     tree
+    sops
+    age
   ];
 
   programs.tmux = {

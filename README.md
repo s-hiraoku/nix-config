@@ -151,6 +151,40 @@ xdg.configFile."nvim/lua/plugins/example.lua".text = ''
 '';
 ```
 
+## 秘密情報の管理 (sops + age)
+
+API キーなどの秘密情報は sops で暗号化して Git 管理している。
+
+### 初回セットアップ（新しい PC）
+
+age の鍵を生成:
+
+```sh
+mkdir -p ~/.config/sops/age
+age-keygen -o ~/.config/sops/age/keys.txt
+```
+
+表示された公開鍵を `.sops.yaml` に追加して、秘密情報を再暗号化:
+
+```sh
+# .sops.yaml に新しい公開鍵を追加した後
+sops updatekeys secrets/secrets.yaml
+```
+
+### 秘密情報の追加・編集
+
+```sh
+sops secrets/secrets.yaml
+```
+
+エディタが開くので、平文で編集して保存すると自動で暗号化される。
+
+### 仕組み
+
+- `secrets/secrets.yaml` — 暗号化された秘密情報（Git 管理）
+- `~/.config/sops/age/keys.txt` — 復号用の秘密鍵（Git 管理外）
+- `load-secrets` — シェル起動時に復号して環境変数に設定
+
 ## トラブルシューティング
 
 ### 既存の設定ファイルと衝突する
