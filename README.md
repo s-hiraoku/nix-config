@@ -1,0 +1,182 @@
+# nix-config
+
+Nix Home Manager による開発環境の構成管理。
+
+## 構成
+
+```
+nix-config/
+├── flake.nix          # 依存関係と環境の定義
+├── flake.lock         # 依存関係のバージョン固定
+└── modules/
+    ├── common.nix     # 共通設定（tmux, neovim, ghostty 等）
+    ├── personal.nix   # 個人用（git email, ghq パス）
+    └── work.nix       # 会社用（git email, ghq パス）
+```
+
+## セットアップ
+
+### 1. Nix のインストール
+
+```sh
+sh <(curl -L https://nixos.org/nix/install)
+```
+
+インストール後、ターミナルを再起動する。
+
+### 2. リポジトリのクローンと適用
+
+```sh
+git clone https://github.com/s-hiraoku/nix-config.git
+cd nix-config
+```
+
+個人 PC の場合:
+
+```sh
+home-manager switch --flake '.#hiraoku.shinichi'
+```
+
+会社 PC の場合:
+
+```sh
+home-manager switch --flake '.#hiraoku.shinichi@work'
+```
+
+## 環境の切り替え
+
+同じ PC で環境を切り替えたい場合は、対応するコマンドを再実行するだけで切り替わる。
+
+```sh
+# 個人用に切り替え
+home-manager switch --flake '.#hiraoku.shinichi'
+
+# 会社用に切り替え
+home-manager switch --flake '.#hiraoku.shinichi@work'
+```
+
+## アップデート
+
+### Nix パッケージの更新
+
+`flake.lock` に記録されている依存関係を最新にする:
+
+```sh
+nix flake update
+home-manager switch --flake '.#hiraoku.shinichi'
+```
+
+### 設定変更の適用
+
+`modules/` 内のファイルを編集した後:
+
+```sh
+home-manager switch --flake '.#hiraoku.shinichi'
+```
+
+## 拡張方法
+
+### パッケージを追加する
+
+`modules/common.nix` の `home.packages` にパッケージを追加:
+
+```nix
+home.packages = with pkgs; [
+  fzf
+  ripgrep
+  # ここに追加
+  jq
+  wget
+];
+```
+
+パッケージは [Nix Packages Search](https://search.nixos.org/packages) で検索できる。
+
+### プログラムの設定を追加する
+
+`modules/common.nix` に `programs.<name>` ブロックを追加:
+
+```nix
+programs.starship = {
+  enable = true;
+  settings = {
+    # ...
+  };
+};
+```
+
+対応プログラムは [Home Manager Options](https://nix-community.github.io/home-manager/options.xhtml) を参照。
+
+### 環境固有の設定を追加する
+
+個人用のみの設定は `modules/personal.nix`、会社用のみの設定は `modules/work.nix` に追加する。
+
+### 新しい環境を追加する
+
+`flake.nix` に `homeConfigurations` を追加し、対応するモジュールを作成:
+
+```nix
+# flake.nix
+homeConfigurations."username@server" = home-manager.lib.homeManagerConfiguration {
+  inherit pkgs;
+  modules = [
+    ./modules/common.nix
+    ./modules/server.nix
+  ];
+};
+```
+
+```nix
+# modules/server.nix
+{ config, pkgs, ... }:
+
+{
+  home.username = "username";
+  home.homeDirectory = "/home/username";
+
+  # サーバー固有の設定
+}
+```
+
+### Neovim プラグインを追加する
+
+`modules/common.nix` に `xdg.configFile` を追加:
+
+```nix
+xdg.configFile."nvim/lua/plugins/example.lua".text = ''
+  return {
+    "author/plugin-name",
+    opts = {},
+  }
+'';
+```
+
+## トラブルシューティング
+
+### 既存の設定ファイルと衝突する
+
+home-manager が既存ファイルとの衝突を検知した場合、既存ファイルをバックアップしてから再実行する:
+
+```sh
+mv ~/.config/tmux/tmux.conf ~/.config/tmux/tmux.conf.bak
+home-manager switch --flake '.#hiraoku.shinichi'
+```
+
+### 前の状態に戻したい
+
+home-manager は世代管理をしている:
+
+```sh
+# 世代の一覧
+home-manager generations
+
+# 前の世代に戻す
+/nix/var/nix/profiles/per-user/$USER/home-manager-<N>-link/activate
+```
+
+または設定の変更を git で戻して再適用:
+
+```sh
+git revert HEAD
+home-manager switch --flake '.#hiraoku.shinichi'
+```
