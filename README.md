@@ -184,6 +184,16 @@ sops secrets/secrets.yaml
 - `secrets/secrets.yaml` — 暗号化された秘密情報（Git 管理）
 - `~/.config/sops/age/keys.txt` — 復号用の秘密鍵（Git 管理外）
 - `load-secrets` — シェル起動時に復号して環境変数に設定
+- `.zshrc` に `eval "$(load-secrets)"` を追加して利用
+
+### エラー時の挙動
+
+`load-secrets` は以下の場合、シェル起動時に警告を表示する:
+
+- `secrets/secrets.yaml` が存在しない
+- `sops` コマンドが見つからない
+- `~/.config/sops/age/keys.txt`（age の秘密鍵）が存在しない
+- 復号に失敗した（鍵の不一致など）
 
 ## トラブルシューティング
 
