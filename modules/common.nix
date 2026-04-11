@@ -160,24 +160,39 @@
     defaultEditor = true;
   };
 
-  xdg.configFile."nvim/lua/plugins/claudecode.lua".text = ''
+  xdg.configFile."nvim/init.lua".text = ''
+    require("config.lazy")
+  '';
+
+  xdg.configFile."nvim/lua/config/options.lua".text = ''
+    vim.g.mapleader = ","
+    vim.g.maplocalleader = ","
+  '';
+
+  xdg.configFile."nvim/lua/config/autocmds.lua".source = ./nvim/config/autocmds.lua;
+  xdg.configFile."nvim/lua/config/lazy.lua".source = ./nvim/config/lazy.lua;
+
+  xdg.configFile."nvim/lua/plugins/neo-tree.lua".text = ''
     return {
-      "coder/claudecode.nvim",
-      dependencies = { "folke/snacks.nvim" },
+      "nvim-neo-tree/neo-tree.nvim",
       opts = {
-        terminal_cmd = "synapse claude -- --dangerously-skip-permissions",
-      },
-      keys = {
-        { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-        { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
-        { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+        window = {
+          position = "left",
+          width = 30,
+          mappings = {
+            ["<esc>"] = "none",
+          },
+        },
       },
     }
   '';
 
-  xdg.configFile."nvim/lua/plugins/noice-disable.lua".text = ''
+  xdg.configFile."nvim/lua/plugins/claudecode.lua".text = ''
     return {
-      { "folke/noice.nvim", enabled = false },
+      "coder/claudecode.nvim",
+      opts = {
+        terminal_cmd = "synapse claude -- --dangerously-skip-permissions",
+      },
     }
   '';
 
