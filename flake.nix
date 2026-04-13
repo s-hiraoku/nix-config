@@ -24,7 +24,7 @@
         ];
       };
 
-      homeConfigurations."hiraoku.shinichi@work" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."hiraoku.shinichi@PC-05481" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
           ./modules/common.nix
