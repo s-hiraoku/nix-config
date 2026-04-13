@@ -1,0 +1,12 @@
+# Tool working directories
+.claude/
+.agents/
+.synapse/
+
+# Editor
+*.swp
+.DS_Store
+
+# age private keys — never commit
+*.age-key
+keys.txt
