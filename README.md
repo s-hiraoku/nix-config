@@ -40,7 +40,7 @@ home-manager switch --flake '.#hiraoku.shinichi'
 会社 PC の場合:
 
 ```sh
-home-manager switch --flake '.#hiraoku.shinichi@work'
+home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
 ## 環境の切り替え
@@ -52,7 +52,7 @@ home-manager switch --flake '.#hiraoku.shinichi@work'
 home-manager switch --flake '.#hiraoku.shinichi'
 
 # 会社用に切り替え
-home-manager switch --flake '.#hiraoku.shinichi@work'
+home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
 ## アップデート

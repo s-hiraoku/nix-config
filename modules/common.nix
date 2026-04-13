@@ -166,6 +166,11 @@
     };
   };
 
+  programs.zsh = {
+    enable = true;
+    initContent = builtins.readFile ./zsh/zshrc.sh;
+  };
+
   programs.neovim = {
     enable = true;
     defaultEditor = true;
