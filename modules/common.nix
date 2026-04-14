@@ -34,6 +34,7 @@
     gh
     yazi
     tree
+    mise
     sops
     age
   ];

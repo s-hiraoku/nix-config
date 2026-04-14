@@ -217,10 +217,14 @@ precmd_functions+=(_update_terminal_context_title)
 DISABLE_AUTO_TITLE="true"
 
 # mise (runtime version manager)
-eval "$($HOME/.local/bin/mise activate zsh)"
+if command -v mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+fi
 
 # Load encrypted secrets (sops + age)
-eval "$(load-secrets)"
+if command -v load-secrets &>/dev/null && [[ -f "${SOPS_SECRETS_FILE:-$HOME/nix-config/secrets/secrets.yaml}" ]]; then
+  eval "$(load-secrets)"
+fi
 
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"

@@ -6,12 +6,20 @@ Nix Home Manager による開発環境の構成管理。
 
 ```
 nix-config/
-├── flake.nix          # 依存関係と環境の定義
-├── flake.lock         # 依存関係のバージョン固定
+├── flake.nix              # 依存関係と環境の定義
+├── flake.lock             # 依存関係のバージョン固定
 └── modules/
-    ├── common.nix     # 共通設定（tmux, neovim, ghostty 等）
-    ├── personal.nix   # 個人用（git email, ghq パス）
-    └── work.nix       # 会社用（git email, ghq パス）
+    ├── common.nix         # 共通設定（パッケージ、git 等）
+    ├── personal.nix       # 個人用（git email, ghq パス）
+    ├── work.nix           # 会社用（git email, ghq パス）
+    ├── tmux.nix           # tmux 設定
+    ├── lazygit.nix        # lazygit 設定
+    ├── zsh.nix            # zsh 設定
+    ├── neovim.nix         # neovim 設定
+    ├── ghostty.nix        # ghostty 設定
+    ├── nvim/              # neovim Lua ファイル
+    ├── zsh/               # zsh スクリプト
+    └── scripts/           # ユーティリティスクリプト
 ```
 
 ## セットアップ
@@ -140,15 +148,19 @@ homeConfigurations."username@server" = home-manager.lib.homeManagerConfiguration
 
 ### Neovim プラグインを追加する
 
-`modules/common.nix` に `xdg.configFile` を追加:
+`modules/nvim/plugins/` に Lua ファイルを追加し、`modules/neovim.nix` に参照を追加:
+
+```lua
+-- modules/nvim/plugins/example.lua
+return {
+  "author/plugin-name",
+  opts = {},
+}
+```
 
 ```nix
-xdg.configFile."nvim/lua/plugins/example.lua".text = ''
-  return {
-    "author/plugin-name",
-    opts = {},
-  }
-'';
+-- modules/neovim.nix に追加
+xdg.configFile."nvim/lua/plugins/example.lua".source = ./nvim/plugins/example.lua;
 ```
 
 ## 秘密情報の管理 (sops + age)
