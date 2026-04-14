@@ -4,7 +4,9 @@
   programs.ghostty = {
     enable = true;
     package = null;
-    enableZshIntegration = true;
+    # Zsh integration is manually sourced in zshrc.sh (only outside tmux)
+    # because Ghostty's PS1 marker injection breaks p10k's nested parameter expansions.
+    enableZshIntegration = false;
     settings = {
       # Appearance
       theme = "TokyoNight Night";

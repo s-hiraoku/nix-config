@@ -1,20 +1,3 @@
-# Auto-start tmux in Ghostty (skip in nested tmux, VSCode, etc.)
-# MUST run before p10k instant prompt — p10k redirects file descriptors,
-# which breaks exec tmux and causes Ghostty to crash on launch.
-if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" && -z "$VSCODE_PID" && -z "$INSIDE_EMACS" ]]; then
-  if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-  fi
-  _last=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1)
-  _next=$(( ${_last:-0} + 1 ))
-  exec tmux new-session -s "$_next"
-fi
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Homebrew
 if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -223,3 +206,10 @@ fi
 
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
+
+# Ghostty shell integration — only outside tmux.
+# Inside tmux, Ghostty's PS1 marker injection (%{…%}) breaks p10k's nested
+# parameter expansions, causing literal ":-}}" to appear in the prompt.
+if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" ]]; then
+  source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
+fi

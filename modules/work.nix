@@ -1,9 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  home.sessionVariables = {
-    P10K_THEME_PATH = "/opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme";
-  };
+  # P10K_THEME_PATH is now set in zsh.nix initContent from Nix store
 
   programs.git.settings = {
     user.email = "hiraoku.shinichi@synergy101.jp";
