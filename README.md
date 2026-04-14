@@ -105,10 +105,10 @@ home.packages = with pkgs; [
 `modules/common.nix` に `programs.<name>` ブロックを追加:
 
 ```nix
-programs.starship = {
+programs.bat = {
   enable = true;
-  settings = {
-    # ...
+  config = {
+    theme = "TwoDark";
   };
 };
 ```
