@@ -37,6 +37,7 @@
     mise
     sops
     age
+    zsh-powerlevel10k
   ];
 
   programs.git = {

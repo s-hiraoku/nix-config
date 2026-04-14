@@ -163,6 +163,16 @@ return {
 xdg.configFile."nvim/lua/plugins/example.lua".source = ./nvim/plugins/example.lua;
 ```
 
+## Zsh プラグイン
+
+以下のプラグインは home-manager で Nix 管理している（Homebrew 不要）:
+
+- **zsh-autosuggestions** — `programs.zsh.autosuggestion.enable` (`zsh.nix`)
+- **zsh-syntax-highlighting** — `programs.zsh.syntaxHighlighting.enable` (`zsh.nix`)
+- **Powerlevel10k** — `zsh-powerlevel10k` パッケージ (`common.nix`)
+
+Powerlevel10k のプロンプト設定は `~/.p10k.zsh` で管理。変更したい場合は `p10k configure` を実行。
+
 ## 秘密情報の管理 (sops + age)
 
 API キーなどの秘密情報は sops で暗号化して Git 管理している。
@@ -195,8 +205,7 @@ sops secrets/secrets.yaml
 
 - `secrets/secrets.yaml` — 暗号化された秘密情報（Git 管理）
 - `~/.config/sops/age/keys.txt` — 復号用の秘密鍵（Git 管理外）
-- `load-secrets` — シェル起動時に復号して環境変数に設定
-- `.zshrc` に `eval "$(load-secrets)"` を追加して利用
+- `load-secrets` — シェル起動時に復号して環境変数に設定（secrets.yaml が存在する場合のみ実行）
 
 ### エラー時の挙動
 

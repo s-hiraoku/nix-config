@@ -26,13 +26,8 @@ if [[ -n "$P10K_THEME_PATH" && -r "$P10K_THEME_PATH" ]]; then
 fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Homebrew completions and plugins
-if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-  source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-  source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-  autoload -Uz compinit && compinit
-fi
+# zsh-autosuggestions, zsh-syntax-highlighting, and completions
+# are now managed by home-manager (programs.zsh.autosuggestion / syntaxHighlighting)
 
 # PATH additions
 export PATH="$PATH:$HOME/.cache/lm-studio/bin"
