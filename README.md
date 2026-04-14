@@ -236,3 +236,7 @@ home-manager generations
 git revert HEAD
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
+
+## 参考
+
+- [Nix入門 - asa1984](https://zenn.dev/asa1984/books/nix-introduction/viewer/01-introduction)
