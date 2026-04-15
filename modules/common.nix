@@ -38,6 +38,7 @@
     sops
     age
     zsh-powerlevel10k
+    imagemagick
   ];
 
   programs.git = {

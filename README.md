@@ -173,6 +173,28 @@ xdg.configFile."nvim/lua/plugins/example.lua".source = ./nvim/plugins/example.lu
 
 Powerlevel10k のプロンプト設定は `~/.p10k.zsh` で管理。変更したい場合は `p10k configure` を実行。
 
+## Neovim で画像ファイルを開く
+
+`snacks.image` を有効化しており、Neovim 内で画像を直接表示できる。
+
+```sh
+nvim image.png
+nvim icon.svg
+nvim photo.jpg
+```
+
+### 対応フォーマット
+
+PNG / JPG / JPEG / GIF / BMP / WebP / SVG / PDF（先頭ページのみ）
+
+SVG や PDF は ImageMagick で変換して表示するため、`common.nix` で `imagemagick` パッケージを Nix 管理している。
+
+### 仕組み
+
+- `modules/nvim/plugins/snacks-image.lua` で `snacks.image` を有効化
+- Ghostty の Kitty graphics protocol を利用して表示
+- Markdown 内の画像参照（`![](path.png)`）もカーソルホバーで表示される
+
 ## 秘密情報の管理 (sops + age)
 
 API キーなどの秘密情報は sops で暗号化して Git 管理している。

@@ -12,4 +12,5 @@
   xdg.configFile."nvim/lua/config/lazy.lua".source = ./nvim/config/lazy.lua;
   xdg.configFile."nvim/lua/plugins/neo-tree.lua".source = ./nvim/plugins/neo-tree.lua;
   xdg.configFile."nvim/lua/plugins/claudecode.lua".source = ./nvim/plugins/claudecode.lua;
+  xdg.configFile."nvim/lua/plugins/snacks-image.lua".source = ./nvim/plugins/snacks-image.lua;
 }
