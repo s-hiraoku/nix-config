@@ -49,5 +49,12 @@
     };
   };
 
+  # ~/.config/nix/nix.conf を home-manager で一元管理する。
+  # 会社 PC のような TLS インスペクション環境では work.nix 側で
+  # ssl-cert-file を上書きする。
+  xdg.configFile."nix/nix.conf".text = ''
+    experimental-features = nix-command flakes
+  '';
+
   programs.home-manager.enable = true;
 }
