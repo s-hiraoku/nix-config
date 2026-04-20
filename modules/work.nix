@@ -7,9 +7,19 @@ let
   # ファイルが実在する場合のみ環境変数を設定する。
   # TODO: 社内ネットワーク側で証明書配布が整理されたら削除。
   catoRootCA = "${config.home.homeDirectory}/certs/CatoNetworksTrustedRootCA.pem";
+
+  # openapi-generator-cli などの Java ツール用 JDK。
+  # LTS (Java 17) を採用。openapi-generator-cli v7.x は Java 11 以上を要求。
+  jdk = pkgs.jdk17;
 in
 {
-  home.sessionVariables = lib.optionalAttrs (builtins.pathExists catoRootCA) {
+  home.packages = [ jdk ];
+
+  home.sessionVariables = {
+    # .home は platform ごとの正しい JAVA_HOME path を返す
+    # (macOS: zulu-17.jdk/Contents/Home / Linux: lib/openjdk)
+    JAVA_HOME = jdk.home;
+  } // lib.optionalAttrs (builtins.pathExists catoRootCA) {
     NODE_EXTRA_CA_CERTS = catoRootCA;
   };
 
