@@ -49,6 +49,9 @@
       # ペインズームイン/アウト
       bind z resize-pane -Z
 
+      # suspend-client を無効化（誤操作でtmuxがサスペンドされるのを防ぐ）
+      unbind-key C-z
+
       # ウィンドウ移動
       bind -r p previous-window
       bind -r n next-window
