@@ -3,8 +3,8 @@
 let
   # 暫定対応: 会社ネットワーク (Cato Networks) の TLS インスペクション向けに
   # Node.js へ Root CA を信頼させる。Node.js は OS のトラストストアを見ないため。
-  # 証明書が未配置の環境 (新規 PC セットアップ中など) でも switch が壊れないよう、
-  # ファイルが実在する場合のみ環境変数を設定する。
+  # flake の pure evaluation 中は host filesystem を見られず builtins.pathExists が
+  # 常に false になりうるため、存在判定は zsh 起動時に行う。
   # TODO: 社内ネットワーク側で証明書配布が整理されたら削除。
   catoRootCA = "${config.home.homeDirectory}/certs/CatoNetworksTrustedRootCA.pem";
 
@@ -19,9 +19,15 @@ in
     # .home は platform ごとの正しい JAVA_HOME path を返す
     # (macOS: zulu-17.jdk/Contents/Home / Linux: lib/openjdk)
     JAVA_HOME = jdk.home;
-  } // lib.optionalAttrs (builtins.pathExists catoRootCA) {
-    NODE_EXTRA_CA_CERTS = catoRootCA;
   };
+
+  programs.zsh.initContent = lib.mkAfter ''
+    if [[ -r "${catoRootCA}" ]]; then
+      export NODE_EXTRA_CA_CERTS="${catoRootCA}"
+    else
+      unset NODE_EXTRA_CA_CERTS
+    fi
+  '';
 
   programs.git.settings = {
     user.email = "hiraoku.shinichi@synergy101.jp";
