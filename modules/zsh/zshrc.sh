@@ -3,6 +3,13 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Nix profile は Homebrew より優先する。
+# brew shellenv が /opt/homebrew を PATH 先頭に差し込むので、その後で
+# Nix profile を再度前出しして gh / git / ripgrep 等の重複を Nix 側で勝たせる。
+if [[ -d "$HOME/.nix-profile/bin" ]]; then
+  export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+fi
+
 # Powerlevel10k theme (path set per-machine via P10K_THEME_PATH)
 if [[ -n "$P10K_THEME_PATH" && -r "$P10K_THEME_PATH" ]]; then
   source "$P10K_THEME_PATH"
