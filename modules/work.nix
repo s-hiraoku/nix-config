@@ -25,10 +25,18 @@ in
   home.sessionVariables = {
     # .home は platform ごとの正しい JAVA_HOME path を返す
     JAVA_HOME = jdk.home;
-    # Node.js は OS のトラストストアを見ないので個別に注入する。
-    # cert が未配置なら Node.js 側で単に無視される。
-    NODE_EXTRA_CA_CERTS = catoRootCA;
   };
+
+  # Node.js は OS のトラストストアを見ないため Cato Root CA を個別に注入する。
+  # flake の pure evaluation 中は host filesystem を見られず builtins.pathExists が
+  # 常に false になりうるので、存在判定は zsh 起動時に行う。
+  programs.zsh.initContent = lib.mkAfter ''
+    if [[ -r "${catoRootCA}" ]]; then
+      export NODE_EXTRA_CA_CERTS="${catoRootCA}"
+    else
+      unset NODE_EXTRA_CA_CERTS
+    fi
+  '';
 
   # activation 時に pkgs.cacert の bundle と Cato cert を連結して永続化する。
   # - Cato cert がある場合: combined bundle (Cato cert 込み)
