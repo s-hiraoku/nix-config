@@ -23,9 +23,9 @@
               read -n 1 -s -r -p "Press any key to continue..."
               exit 1
             fi
+            prompt="''${LAZYGIT_COMMIT_PROMPT:-Generate a single-line commit message in Conventional Commits format: type(scope): description. Type must be one of: feat, fix, docs, style, refactor, test, chore. Base the message strictly on the provided diff. Output ONLY the commit message, nothing else.}"
             echo "Generating commit message with Claude..."
-            msg=$(echo "$diff" | claude -p --model haiku \
-              "Generate a single-line commit message in Conventional Commits format: type(scope): description. Type must be one of: feat, fix, docs, style, refactor, test, chore. Base the message strictly on the provided diff. Output ONLY the commit message, nothing else." 2>&1)
+            msg=$(echo "$diff" | claude -p --no-session-persistence --model haiku "$prompt" 2>&1)
             if [ $? -ne 0 ] || [ -z "$msg" ]; then
               echo "Error: Failed to generate commit message."
               echo "$msg"
