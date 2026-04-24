@@ -13,4 +13,5 @@
   xdg.configFile."nvim/lua/plugins/neo-tree.lua".source = ./nvim/plugins/neo-tree.lua;
   xdg.configFile."nvim/lua/plugins/claudecode.lua".source = ./nvim/plugins/claudecode.lua;
   xdg.configFile."nvim/lua/plugins/snacks-image.lua".source = ./nvim/plugins/snacks-image.lua;
+  xdg.configFile."nvim/lua/plugins/gitsigns.lua".source = ./nvim/plugins/gitsigns.lua;
 }
