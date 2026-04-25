@@ -47,6 +47,10 @@
     ni  # antfu/ni: package manager auto-detect
     opencode
     wtp  # overlay 経由 (pkgs/wtp.nix)
+    librsvg
+    colima
+    ffmpeg
+    python314
   ];
 
   programs.git = {
