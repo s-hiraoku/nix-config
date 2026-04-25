@@ -25,6 +25,10 @@ in
   home.sessionVariables = {
     # .home は platform ごとの正しい JAVA_HOME path を返す
     JAVA_HOME = jdk.home;
+
+    # lazygit の AI コミットメッセージ生成プロンプト (日本語版)。
+    # common 側のデフォルト (英語) を会社 PC では日本語に差し替える。
+    LAZYGIT_COMMIT_PROMPT = "ステージ済みの diff を読んで、Conventional Commits 形式 `type(scope): description` で 1 行の日本語コミットメッセージを出力してください。type は feat, fix, docs, style, refactor, test, chore のいずれかのみ。マークダウンや余計な説明は不要。メッセージ本文のみを返してください。";
   };
 
   # Node.js は OS のトラストストアを見ないため Cato Root CA を個別に注入する。
