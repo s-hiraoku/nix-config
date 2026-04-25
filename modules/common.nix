@@ -39,6 +39,10 @@
     age
     zsh-powerlevel10k
     imagemagick
+    lefthook
+    git-cliff
+    ruff
+    zellij
   ];
 
   programs.git = {
