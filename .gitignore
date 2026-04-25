@@ -10,3 +10,7 @@
 # age private keys — never commit
 *.age-key
 keys.txt
+
+# nix build outputs
+result
+result-*

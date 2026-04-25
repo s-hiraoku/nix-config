@@ -13,7 +13,16 @@
     { nixpkgs, home-manager, ... }:
     let
       system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
+
+      # nixpkgs に未収録のパッケージを overlay で追加する。
+      # 各パッケージは pkgs/ 配下に独立した derivation として置く。
+      overlays = [
+        (final: prev: {
+          wtp = final.callPackage ./pkgs/wtp.nix { };
+        })
+      ];
+
+      pkgs = import nixpkgs { inherit system overlays; };
 
       # ホスト構成は account (誰として使うか) と host (どのマシンか) の
       # 2 軸で組み合わせる。

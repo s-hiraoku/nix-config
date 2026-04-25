@@ -52,30 +52,18 @@ function ghq-fzf() {
 alias g='ghq-fzf'
 
 # wtp (worktree plus)
-if [[ -x /opt/homebrew/bin/wtp ]]; then
-  eval "$(/opt/homebrew/bin/wtp shell-init zsh)"
-elif whence -p wtp >/dev/null 2>&1; then
-  eval "$("$(whence -p wtp)" shell-init zsh)"
+if whence -p wtp >/dev/null 2>&1; then
+  eval "$(wtp shell-init zsh)"
 fi
 
 _wtp_bin() {
-  if [[ -x /opt/homebrew/bin/wtp ]]; then
-    echo /opt/homebrew/bin/wtp
-    return 0
-  fi
-  local bin
-  bin=$(whence -p wtp 2>/dev/null)
-  if [[ -n "$bin" && -x "$bin" ]]; then
-    echo "$bin"
-    return 0
-  fi
-  return 1
+  whence -p wtp 2>/dev/null
 }
 
 wtpcode() {
   local wtp_cmd
   wtp_cmd=$(_wtp_bin)
-  [[ -z "$wtp_cmd" ]] && { echo "wtp not found in PATH or /opt/homebrew/bin/wtp" >&2; return 127; }
+  [[ -z "$wtp_cmd" ]] && { echo "wtp not found in PATH" >&2; return 127; }
   code "$($wtp_cmd cd "$1")"
 }
 
@@ -84,7 +72,7 @@ wtpghostty() {
   local target_path
 
   wtp_cmd=$(_wtp_bin)
-  [[ -z "$wtp_cmd" ]] && { echo "wtp not found in PATH or /opt/homebrew/bin/wtp" >&2; return 127; }
+  [[ -z "$wtp_cmd" ]] && { echo "wtp not found in PATH" >&2; return 127; }
 
   target_path=$($wtp_cmd cd "$1") || return 1
 
