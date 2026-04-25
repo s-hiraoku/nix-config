@@ -28,7 +28,7 @@ in
 
     # lazygit の AI コミットメッセージ生成プロンプト (日本語版)。
     # common 側のデフォルト (英語) を会社 PC では日本語に差し替える。
-    LAZYGIT_COMMIT_PROMPT = "ステージ済みの diff を読んで、Conventional Commits 形式 (feat/fix/chore/refactor/docs 等) で 1 行の日本語コミットメッセージを出力してください。スコープがあれば付ける。マークダウンや余計な説明は不要。メッセージ本文のみ返す。";
+    LAZYGIT_COMMIT_PROMPT = "ステージ済みの diff を読んで、Conventional Commits 形式 `type(scope): description` で 1 行の日本語コミットメッセージを出力してください。type は feat, fix, docs, style, refactor, test, chore のいずれかのみ。マークダウンや余計な説明は不要。メッセージ本文のみを返してください。";
   };
 
   # Node.js は OS のトラストストアを見ないため Cato Root CA を個別に注入する。
