@@ -85,14 +85,42 @@ home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 
 ## アップデート
 
-### Nix パッケージの更新
+### 仕組み
 
-`flake.lock` に記録されている依存関係を最新にする:
+Nix で管理しているツールのバージョンは `flake.lock` に固定された **nixpkgs のリビジョン**に紐づく。
+個別ツールだけ最新にするのではなく、「nixpkgs 全体を新しいリビジョンに上げる → そこに含まれる全ツールが新しくなる」という流れ。
+
+### よく使うコマンド
+
+| やりたいこと | コマンド |
+|---|---|
+| 特定ツールの新版が欲しい (nixpkgs だけ更新) | `nix flake update nixpkgs` |
+| 全 input を最新化 (月 1 メンテ的に) | `nix flake update` |
+| 設定変更や `flake.lock` 更新の適用 | `home-manager switch --flake '.#hiraoku.shinichi'` |
+
+### 標準的な更新フロー
+
+例: `gh` を新しいバージョンにしたい時。
 
 ```sh
-nix flake update
+# 1. nixpkgs を最新にする
+nix flake update nixpkgs
+
+# 2. 適用して動作確認
 home-manager switch --flake '.#hiraoku.shinichi'
+gh --version
+
+# 3. flake.lock の変更を git にコミット → push → PR
+# (CLAUDE.md のワークフローに従う)
 ```
+
+会社 PC は PR マージ後に `git pull && home-manager switch --flake '.#hiraoku.shinichi@PC-05481'` で同期。
+
+### 注意点
+
+- nixpkgs の `nixos-unstable` チャネルは数日に 1 回更新される。タイミングによっては「期待した最新版がまだ nixpkgs に入っていない」ことがある (例: 4/14 リビジョンに `gh 2.90.0`、4/18 リビジョンに `gh 2.89.0` のような前後)。
+- 更新後にバージョンが下がっていないか `--version` で必ず確認する。
+- 不具合があれば `flake.lock` を `git revert` して戻せる (詳細はトラブルシューティング節)。
 
 ### 設定変更の適用
 
@@ -287,6 +315,17 @@ home-manager generations
 
 ```sh
 git revert HEAD
+home-manager switch --flake '.#hiraoku.shinichi'
+```
+
+### nix flake update でツールのバージョンが下がった
+
+nixpkgs の更新タイミングによっては、特定パッケージのバージョンが直前のリビジョンより古いことがある。
+`flake.lock` の更新を git revert して元に戻す:
+
+```sh
+git log flake.lock      # 直近の flake.lock 更新コミットを確認
+git revert <commit>     # その更新を打ち消す
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
 
