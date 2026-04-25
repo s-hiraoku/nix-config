@@ -14,22 +14,9 @@ let
   # home-manager の activation で毎回再生成されるため、ライブラリ更新
   # (nix flake update) や再起動を跨いでも drift しない。
   combinedCA = "${config.home.homeDirectory}/.local/share/nix-config/ca-bundle.pem";
-
-  # openapi-generator-cli などの Java ツール用 JDK。
-  # LTS (Java 17) を採用。openapi-generator-cli v7.x は Java 11 以上を要求。
-  jdk = pkgs.jdk17;
 in
 {
-  home.packages = [ jdk ];
-
-  home.sessionVariables = {
-    # .home は platform ごとの正しい JAVA_HOME path を返す
-    JAVA_HOME = jdk.home;
-
-    # lazygit の AI コミットメッセージ生成プロンプト (日本語版)。
-    # common 側のデフォルト (英語) を会社 PC では日本語に差し替える。
-    LAZYGIT_COMMIT_PROMPT = "ステージ済みの diff を読んで、Conventional Commits 形式 `type(scope): description` で 1 行の日本語コミットメッセージを出力してください。type は feat, fix, docs, style, refactor, test, chore のいずれかのみ。マークダウンや余計な説明は不要。メッセージ本文のみを返してください。";
-  };
+  programs.git.settings.ghq.root = "${config.home.homeDirectory}/ghq";
 
   # Node.js は OS のトラストストアを見ないため Cato Root CA を個別に注入する。
   # flake の pure evaluation 中は host filesystem を見られず builtins.pathExists が
@@ -53,7 +40,7 @@ in
       run sh -c 'cat "${nixCA}" "${catoRootCA}" > "${combinedCA}"'
     else
       run cp "${nixCA}" "${combinedCA}"
-      echo "warning(work.nix): Cato cert not found at ${catoRootCA}, using pkgs.cacert only" >&2
+      echo "warning(work-pc05481.nix): Cato cert not found at ${catoRootCA}, using pkgs.cacert only" >&2
     fi
   '';
 
@@ -63,9 +50,4 @@ in
     experimental-features = nix-command flakes
     ssl-cert-file = ${combinedCA}
   '';
-
-  programs.git.settings = {
-    user.email = "hiraoku.shinichi@synergy101.jp";
-    ghq.root = "${config.home.homeDirectory}/ghq";
-  };
 }

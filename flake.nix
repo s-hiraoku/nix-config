@@ -14,21 +14,24 @@
     let
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
+
+      # ホスト構成は account (誰として使うか) と host (どのマシンか) の
+      # 2 軸で組み合わせる。
+      mkHome = modules: home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./modules/common.nix ] ++ modules;
+      };
     in
     {
-      homeConfigurations."hiraoku.shinichi" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [
-          ./modules/common.nix
-          ./modules/personal.nix
+      homeConfigurations = {
+        "hiraoku.shinichi" = mkHome [
+          ./modules/accounts/personal.nix
+          ./modules/hosts/personal-mbp.nix
         ];
-      };
 
-      homeConfigurations."hiraoku.shinichi@PC-05481" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = [
-          ./modules/common.nix
-          ./modules/work.nix
+        "hiraoku.shinichi@PC-05481" = mkHome [
+          ./modules/accounts/work.nix
+          ./modules/hosts/work-pc05481.nix
         ];
       };
     };
