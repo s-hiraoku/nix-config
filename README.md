@@ -4,14 +4,21 @@ Nix Home Manager による開発環境の構成管理。
 
 ## 構成
 
+設定は **account (誰として使うか)** と **host (どのマシンか)** の 2 軸で分割している。
+`flake.nix` で `common + accounts/<name> + hosts/<name>` を組み合わせて 1 つのホスト構成を作る。
+
 ```
 nix-config/
-├── flake.nix              # 依存関係と環境の定義
+├── flake.nix              # ホスト構成 (account × host の組み合わせ)
 ├── flake.lock             # 依存関係のバージョン固定
 └── modules/
-    ├── common.nix         # 共通設定（パッケージ、git 等）
-    ├── personal.nix       # 個人用（git email, ghq パス）
-    ├── work.nix           # 会社用（git email, ghq パス）
+    ├── common.nix         # 全環境共通 (パッケージ、git 共通設定 等)
+    ├── accounts/          # アカウント軸: 誰として使うか
+    │   ├── personal.nix   # 個人アカウント (git email, lazygit プロンプト英語)
+    │   └── work.nix       # 会社アカウント (git email, JDK17, lazygit プロンプト日本語)
+    ├── hosts/             # ホスト軸: どの物理マシンか
+    │   ├── personal-mbp.nix    # 個人 MacBook (外付け SSD の ghq path 等)
+    │   └── work-pc05481.nix    # 会社 PC (Cato Root CA, ssl-cert-file 等)
     ├── tmux.nix           # tmux 設定
     ├── lazygit.nix        # lazygit 設定
     ├── zsh.nix            # zsh 設定
@@ -21,6 +28,19 @@ nix-config/
     ├── zsh/               # zsh スクリプト
     └── scripts/           # ユーティリティスクリプト
 ```
+
+### 2 軸分割の意図
+
+|  | 個人アカウント | 会社アカウント |
+|---|---|---|
+| **個人 MBP** | `accounts/personal` + `hosts/personal-mbp` | — |
+| **会社 PC-05481** | — | `accounts/work` + `hosts/work-pc05481` |
+
+- **account** は買い替えても変わらない (メールアドレス、コミット言語、業務用パッケージ)
+- **host** はマシン固有 (外付け SSD のパス、社内ネットワークの証明書ファイル位置)
+
+新しい個人 PC を買った時は `hosts/personal-mbpN.nix` を 1 ファイル追加するだけで、
+`accounts/personal.nix` をそのまま再利用できる。
 
 ## セットアップ
 
@@ -117,34 +137,36 @@ programs.bat = {
 
 ### 環境固有の設定を追加する
 
-個人用のみの設定は `modules/personal.nix`、会社用のみの設定は `modules/work.nix` に追加する。
+設定の性質に応じて以下のいずれかに追加する:
+
+- **アカウント全体に効かせたい** (どの個人 PC でも使う、どの会社 PC でも使う等)
+  → `modules/accounts/personal.nix` または `modules/accounts/work.nix`
+- **特定マシン固有のもの** (この PC のディスク構成、ネットワーク証明書 等)
+  → `modules/hosts/<host-name>.nix`
+
+判断基準: **「マシンを買い替えてもこの値は変わるか？」** で振り分ける。
+変わらない (= 同じアカウントなら使い回したい) なら `accounts/`、変わるなら `hosts/`。
 
 ### 新しい環境を追加する
 
-`flake.nix` に `homeConfigurations` を追加し、対応するモジュールを作成:
+新しい個人 PC を買った場合 (例: `MacBook-Pro-2`):
+
+1. `modules/hosts/personal-mbp2.nix` を作成 (このマシン固有の差分のみ)
+2. `flake.nix` に 1 エントリ追加:
 
 ```nix
 # flake.nix
-homeConfigurations."username@server" = home-manager.lib.homeManagerConfiguration {
-  inherit pkgs;
-  modules = [
-    ./modules/common.nix
-    ./modules/server.nix
+homeConfigurations = {
+  # 既存の構成 ...
+
+  "hiraoku.shinichi@MacBook-Pro-2" = mkHome [
+    ./modules/accounts/personal.nix    # 既存の個人アカウント設定をそのまま再利用
+    ./modules/hosts/personal-mbp2.nix  # 新規作成した host 設定
   ];
 };
 ```
 
-```nix
-# modules/server.nix
-{ config, pkgs, ... }:
-
-{
-  home.username = "username";
-  home.homeDirectory = "/home/username";
-
-  # サーバー固有の設定
-}
-```
+`mkHome` は `flake.nix` で定義済みのヘルパー関数。`./modules/common.nix` は自動で読み込まれる。
 
 ### Neovim プラグインを追加する
 
