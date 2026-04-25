@@ -43,6 +43,10 @@
     git-cliff
     ruff
     zellij
+    gemini-cli
+    ni  # antfu/ni: package manager auto-detect
+    opencode
+    wtp  # overlay 経由 (pkgs/wtp.nix)
   ];
 
   programs.git = {
