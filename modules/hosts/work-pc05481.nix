@@ -50,4 +50,9 @@ in
     experimental-features = nix-command flakes
     ssl-cert-file = ${combinedCA}
   '';
+
+  # git は OS のトラストストアを見ないため、combined bundle を明示的に渡す。
+  # これで Cato Networks の TLS インスペクション環境でも `git clone` 等が通る。
+  # user.email は accounts/work.nix、ghq.root は上記で定義済みのため、ここでは sslCAInfo のみ追加する。
+  programs.git.settings.http.sslCAInfo = combinedCA;
 }
