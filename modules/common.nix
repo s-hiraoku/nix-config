@@ -23,7 +23,6 @@
   };
 
   home.packages = with pkgs; [
-    fzf
     zoxide
     ghq
     delta
