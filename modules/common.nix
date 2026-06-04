@@ -52,6 +52,14 @@
     python314
   ];
 
+  # fzf: 素のパッケージではなく programs.fzf モジュールで導入し、
+  # zsh 統合（^R 履歴検索 / ^T ファイル挿入 / ALT-C cd）を有効化する。
+  # これがないと ^R が zsh デフォルトの redisplay のままになる。
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   programs.git = {
     enable = true;
     settings = {
