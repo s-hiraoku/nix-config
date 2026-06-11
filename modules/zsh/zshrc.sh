@@ -26,6 +26,7 @@ export PATH="/opt/homebrew/opt/postgresql@14/bin:$PATH"
 export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 export PATH="$PATH:$HOME/Library/Python/3.11/bin"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # Local env
 [[ -r "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
