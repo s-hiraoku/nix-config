@@ -27,6 +27,11 @@ in
     else
       unset NODE_EXTRA_CA_CERTS
     fi
+
+    # Node.js に OS (macOS keychain) のトラストストアを参照させる。
+    # Cato Networks の Root CA が system keychain に入っている場合に
+    # NODE_EXTRA_CA_CERTS と併せて TLS 検証を通すための保険。
+    export NODE_OPTIONS=--use-system-ca
   '';
 
   # activation 時に pkgs.cacert の bundle と Cato cert を連結して永続化する。
