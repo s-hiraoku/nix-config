@@ -1,6 +1,24 @@
 -- ファジーファインダー
 return {
   "nvim-telescope/telescope.nvim",
+  -- 起動時ロードを避ける。:Telescope か <leader>f 系キーで初回ロードされる。
+  -- キーマップの実体は config 内で設定するため、keys にはロードのトリガーと
+  -- なるキー文字列だけを列挙する（lazy がスタブを張り、押下時にロード→実キーへ委譲）。
+  cmd = "Telescope",
+  keys = {
+    "<leader>ff",
+    "<leader>fg",
+    "<leader>fb",
+    "<leader>fh",
+    "<leader>fd",
+    "<leader>fr",
+    "<leader>fR",
+    "<leader>fc",
+    "<leader>fk",
+    "<leader>dl",
+    "<leader>hP",
+    "<leader>:",
+  },
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },

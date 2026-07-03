@@ -5,6 +5,7 @@ return {
   {
     "akinsho/bufferline.nvim",
     version = "*",
+    event = "VeryLazy",
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       require("bufferline").setup({
@@ -29,6 +30,7 @@ return {
   -- Git サイン (変更行表示)
   {
     "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
       require("gitsigns").setup({
         -- add / change / changedelete は行頭の細い縦線 ▎ で統一。
@@ -84,6 +86,13 @@ return {
   -- コメントトグル (gcc / gc)
   {
     "numToStr/Comment.nvim",
+    -- gc / gcc（行・選択のコメントトグル）と gb 系のオペレータで初回ロードする。
+    keys = {
+      { "gcc", desc = "Comment: toggle line" },
+      { "gbc", desc = "Comment: toggle block" },
+      { "gc", mode = { "n", "o", "x" }, desc = "Comment: toggle (linewise)" },
+      { "gb", mode = { "n", "o", "x" }, desc = "Comment: toggle (blockwise)" },
+    },
     config = function()
       require("Comment").setup()
     end,

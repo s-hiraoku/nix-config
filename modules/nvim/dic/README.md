@@ -9,10 +9,22 @@
 
 | ファイル | 用途 |
 |---------|------|
-| `custom.utf-8.add` | native spell の無視単語リスト（`zg` で追記される）。1 行 1 単語 |
-| `custom.utf-8.add.spl` | nvim が自動生成するコンパイル済み（コミット不要） |
+| `custom.utf-8.add` | native spell の無視単語リストの**シード**。1 行 1 単語 |
 | `cspell.json` | cspell のグローバル設定（nvim-lint が `--config` で参照） |
 | `custom-words.txt` | cspell の無視単語リスト。1 行 1 単語。手で追記する |
+
+## native spell の書き込み場所（重要）
+
+`~/.config/nvim` は nix ストアへの読み取り専用 symlink なので、`zg`/`zw` が
+`custom.utf-8.add` へ追記できない（E509）。そこで実際の spellfile は書き込み可能な
+`~/.local/share/nvim/spell/custom.utf-8.add` に置く。`modules/neovim.nix` の
+`seedNvimSpellfile` activation が、このディレクトリの `custom.utf-8.add` を
+**初回のみ**そこへコピー（シード）する。
+
+- `zg`/`zw` の追記は `~/.local/share/nvim/spell/custom.utf-8.add` に入る。
+- リポジトリへ永続化したい単語は、そのファイルの差分をこの `custom.utf-8.add`
+  シードへ手動でコピーし直してコミットする。
+- `.spl`（コンパイル済み）は nvim が spellfile の隣に自動生成する（コミット不要）。
 
 ## native spell の使い方
 

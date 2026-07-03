@@ -1,6 +1,7 @@
 -- ステータスライン
 return {
   "nvim-lualine/lualine.nvim",
+  event = "VeryLazy",
   dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin/nvim" },
   config = function()
     require("lualine").setup({

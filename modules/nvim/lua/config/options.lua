@@ -84,11 +84,14 @@ opt.spell = true
 opt.spelllang = { "en_us", "cjk" }
 -- camelCase / snake_case を単語ごとに分割して判定（コードの誤検知を減らす）
 opt.spelloptions = "camel"
--- ユーザー辞書: ~/.config/nvim/dic/custom.utf-8.add
+-- ユーザー辞書: ~/.local/share/nvim/spell/custom.utf-8.add（書き込み可能な場所）
 --   zg で「正しい単語」として登録（このファイルに追記される）
 --   zw で「誤り」として登録 / zug で取り消し
 --   登録すると nvim が自動で .spl にコンパイルする
-opt.spellfile = vim.fn.expand("~/.config/nvim/dic/custom.utf-8.add")
+--   NOTE: ~/.config/nvim は nix ストアの読み取り専用 symlink なので追記できない。
+--   modules/neovim.nix が modules/nvim/dic/custom.utf-8.add をここへシードする。
+--   リポジトリへ反映したい単語はシードへ手動でコピーし直す。
+opt.spellfile = vim.fn.stdpath("data") .. "/spell/custom.utf-8.add"
 
 -- コード折りたたみ（treesitter ベース）
 -- グローバルデフォルトを設定

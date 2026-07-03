@@ -75,32 +75,30 @@ function M.setup()
   vim.lsp.config("eslint", {
     settings = { workingDirectories = { mode = "auto" } },
   })
-  vim.api.nvim_create_autocmd("LspAttach", {
-    group = vim.api.nvim_create_augroup("UserEslintFixAll", {}),
-    callback = function(ev)
-      local client = vim.lsp.get_client_by_id(ev.data.client_id)
-      if not client or client.name ~= "eslint" then
-        return
-      end
-      -- このバッファの保存直前に eslint の全自動修正を同期実行する
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = ev.buf,
-        callback = function()
-          pcall(function()
-            client:request_sync("workspace/executeCommand", {
-              command = "eslint.applyAllFixes",
-              arguments = {
-                {
-                  uri = vim.uri_from_bufnr(ev.buf),
-                  version = vim.lsp.util.buf_versions[ev.buf],
-                },
-              },
-            }, 3000, ev.buf)
-          end)
-        end,
-      })
-    end,
-  })
+end
+
+-- eslint の全自動修正 (applyAllFixes) をバッファに対して同期実行する。
+-- 以前は LspAttach で独自の BufWritePre を張っていたが、conform の
+-- format_on_save (これも BufWritePre) との実行順が lazy-load タイミング依存で
+-- 不定になり、prettier が eslint より先に走ると整形が 1 回の保存で収束しない
+-- ことがあった。そこで保存時整形は conform に一本化し、conform の
+-- format_on_save コールバックの先頭からこの関数を呼ぶことで
+-- 「eslint fixAll → prettier」の順序を確定させる (formatting.lua)。
+function M.eslint_fix_sync(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr, name = "eslint" })) do
+    pcall(function()
+      client:request_sync("workspace/executeCommand", {
+        command = "eslint.applyAllFixes",
+        arguments = {
+          {
+            uri = vim.uri_from_bufnr(bufnr),
+            version = vim.lsp.util.buf_versions[bufnr],
+          },
+        },
+      }, 3000, bufnr)
+    end)
+  end
 end
 
 return M
