@@ -328,6 +328,15 @@ modules/nvim/
 
 `:DiffviewOpen` 等 or `<leader>hD` 経由でロード。ビュー内 `q` で全体を一発クローズ。グローバルに `<leader>hQ`（`:DiffviewClose`）でどこからでも閉じられる。
 
+#### lazygit.nvim — nvim 内で lazygit を起動
+
+| Key | 動作 |
+|-----|------|
+| `<leader>gg` | lazygit をフローティングウィンドウで開く（プロジェクトルート） |
+| `<leader>gf` | 現在ファイルのリポジトリで lazygit を開く |
+
+lazygit 本体・設定（delta ページャ、`<C-g>` の AI コミット）は `modules/lazygit.nix` で管理。
+
 ### 編集支援
 
 #### nvim-surround — 囲み操作
