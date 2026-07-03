@@ -44,7 +44,7 @@ return {
         -- 上の routes で popup に流す。
         long_message_to_split = false,
       },
-      -- 通知は snacks.notifier に任せる
+      -- 通知は noice 標準の notify ビューで表示する
       notify = { enabled = true },
     },
     config = function(_, opts)
