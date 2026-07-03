@@ -16,6 +16,12 @@
 
       # nixpkgs に未収録のパッケージを overlay で追加する。
       # 各パッケージは pkgs/ 配下に独立した derivation として置く。
+      # NOTE: herdr は nixpkgs 版が Darwin でソースビルドに失敗するため
+      # (vendored libghostty-vt の zig ビルドが Apple SDK を見つけられず
+      #  DarwinSdkNotFound。upstream issue ogulcancelik/herdr#285)、
+      # 本体は Homebrew (brew install herdr) で導入し、Nix では設定のみ管理する
+      # (modules/herdr.nix)。upstream / nixpkgs が Darwin ビルドを直したら
+      # ここに herdr overlay を足して本体も Nix 管理へ移行する。
       overlays = [
         (final: prev: {
           wtp = final.callPackage ./pkgs/wtp.nix { };
