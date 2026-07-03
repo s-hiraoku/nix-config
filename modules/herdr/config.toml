@@ -40,8 +40,11 @@ zoom = "prefix+z"
 # ウィンドウ(タブ)移動
 # ⚠️ tmux では `bind -r p/n` でリピート(連打)可能だが、herdr にリピート相当の
 #    設定はドキュメント上見当たらない。単発移動になる想定。
-prev_tab = "prefix+p"
+previous_tab = "prefix+p"
 next_tab = "prefix+n"
+
+# 番号指定でタブへジャンプ (prefix+1 〜 prefix+9)
+switch_tab = "prefix+1..9"
 
 # ペインリサイズ
 # ⚠️ tmux の `bind -r H/J/K/L resize-pane`(prefix 押しっぱなし連打)は再現不可。
