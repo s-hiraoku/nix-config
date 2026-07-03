@@ -1,0 +1,10 @@
+nvim
+neovim
+treesitter
+lua
+catppuccin
+macchiato
+lualine
+copilot
+tailwind
+vtsls
