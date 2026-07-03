@@ -18,11 +18,10 @@
 3. [キーバインド早見表](#キーバインド早見表)
 4. [LSP](#lsp)
 5. [補完 (completion)](#補完-completion)
-6. [Copilot](#copilot)
-7. [フォーマット / Lint](#フォーマット--lint)
-8. [プラグイン詳細](#プラグイン詳細)
-9. [自動挙動 (autocmds)](#自動挙動-autocmds)
-10. [構成とメンテナンス](#構成とメンテナンス)
+6. [フォーマット / Lint](#フォーマット--lint)
+7. [プラグイン詳細](#プラグイン詳細)
+8. [自動挙動 (autocmds)](#自動挙動-autocmds)
+9. [構成とメンテナンス](#構成とメンテナンス)
 
 ---
 
@@ -148,7 +147,6 @@ modules/nvim/
 |-----|------|
 | `<leader>sp` | スペルチェック トグル |
 | `<leader>tr` | 行の折り返し トグル |
-| `<leader>tc` | Copilot トグル |
 
 ### マクロ記録
 
@@ -201,7 +199,6 @@ modules/nvim/
 
 - **ソース**（優先順）: ① `nvim_lsp`・`luasnip` → ② `buffer`・`path`
 - **並び**: Field / Property を優先（props-first）
-- Copilot は補完メニューに出さず、インラインのゴーストテキストのみ
 
 ### insert モードのキー
 
@@ -216,22 +213,6 @@ modules/nvim/
 | `<C-f>` | メニュー表示中はドキュメント下スクロール / それ以外は前方単語へ |
 
 **コマンドライン補完**: `:` は path→cmdline、`/` `?` 検索は buffer ソース。
-
----
-
-## Copilot
-
-`copilot.lua`、**ゴーストテキスト（インライン）のみ**（パネル無効）。全ファイルタイプで自動トリガー。
-
-| Mode | Key | 動作 |
-|------|-----|------|
-| i | `<C-j>` | 提案を採用（表示中のみ） |
-| i | `<C-.>` | 次の提案 / 表示 |
-| i | `<C-,>` | 前の提案 |
-| i | `<C-]>` | 提案を却下 |
-| n | `<leader>tc` | Copilot ON/OFF トグル（lualine のインジケータと連動） |
-
-> `<C-.>` / `<C-,>` は **Kitty keyboard protocol 対応端末（ghostty 等）** でのみ届く。cmp メニュー表示中でもゴーストは出る（ゴーストは `<C-j>`、cmp 候補は `<CR>` で採用）。
 
 ---
 
@@ -290,7 +271,6 @@ modules/nvim/
 | `<left>` | 開いてるフォルダを閉じる / 閉じてるなら親フォルダ行へ |
 | `<right>` | カーソル下フォルダを開く |
 | `F` | 現在ファイルへの追従 ON/OFF（lualine に状態表示） |
-| `<leader>pd` | ノードを CopilotChat に渡す（dir→`#glob`、file→`#file`） |
 
 - `.env` 等のドットファイルは表示、gitignore 対象は非表示。外部変更をリアルタイム検知。
 - `nvim <dir>` でディレクトリ起動するとツリーを開いてエディタにフォーカスを戻す。
@@ -383,7 +363,7 @@ insert では `<C-_>`（= `^/`）で現在行トグル。
 
 - **catppuccin** — カラースキーム（Macchiato、透過背景）
 - **bufferline.nvim** — 上部のバッファタブ（`<Tab>`/`<S-Tab>` で移動）
-- **lualine.nvim** — 下部ステータスライン。Neo-tree 追従・git branch/diff・診断・Copilot ON/OFF・spell・wrap・lazy 更新件数・LSP サーバ名・行数を表示
+- **lualine.nvim** — 下部ステータスライン。Neo-tree 追従・git branch/diff・診断・spell・wrap・lazy 更新件数・LSP サーバ名・行数を表示
 - **noice.nvim** — `:` コマンドをフロート表示 & 入力サジェスト。`<leader>snh`（履歴）/ `<leader>sna`（全メッセージ）/ `<leader>snd`（通知クリア）
 - **indent-blankline.nvim** — インデントガイド（`▏`）
 - **which-key.nvim** — キー入力途中でバインド一覧をポップアップ（helix プリセット）

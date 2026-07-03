@@ -35,16 +35,6 @@ return {
         -- ファイル名は winbar で表示しているのでステータスラインからは省略
         lualine_c = {},
         lualine_x = {
-          -- Copilot の ON/OFF 状態（<leader>tc でトグル）
-          -- アイコンで状態を表す: 󰚩 ON(点灯色) / 󱚧 OFF(消灯色)
-          {
-            function()
-              return vim.g.copilot_enabled ~= false and "󰚩" or "󱚧"
-            end,
-            color = function()
-              return { fg = vim.g.copilot_enabled ~= false and "#a6da95" or "#6e738d" }
-            end,
-          },
           -- spell の ON/OFF（<leader>sp）。OFF を表すスラッシュ版アイコンが無いため、色だけで出し分ける
           {
             function()

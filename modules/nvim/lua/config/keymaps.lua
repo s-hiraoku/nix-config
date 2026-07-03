@@ -100,7 +100,7 @@ map("x", "<leader>tw", "St", { remap = true, desc = "Wrap selection in HTML/JSX 
 -- insert モード: zsh(readline/emacs)風の行編集
 --   既に nvim 標準: ^U(カーソル前を削除) / ^W(前の単語を削除=backward-kill-word) / ^H(Backspace)
 --   ^B ^F ^E は cmp と兼用（メニュー表示中=docs スクロール/abort / 非表示=単語移動・行末）→ plugins/completion.lua で定義
---   ^J ^] ^, ^. → Copilot 占有 / ^R ^T ^V → nvim 標準を温存
+--   ^R ^T ^V → nvim 標準を温存
 map("i", "<C-k>", "<C-o>D", { desc = "Kill to end of line (zsh ^K)" })
 map("i", "<C-d>", "<C-o>dw", { desc = "Kill word forward (zsh ^D) ※insert の dedent を上書き" })
 -- ^A=行頭。tmux prefix(C-a) と競合するため tmux 内では C-a C-a の2回押しで届く

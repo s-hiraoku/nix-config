@@ -139,8 +139,6 @@ return {
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
         { name = "luasnip" },
-        -- copilot はインライン補完（copilot.lua）で「欲しいときだけ」出す方針にしたため
-        -- 補完メニューのソースからは外している
       }, {
         { name = "buffer" },
         { name = "path" },

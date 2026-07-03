@@ -131,7 +131,7 @@ end
 -- state.follow_current_file.enabled を倒すだけでは追従が止まらない。
 -- そこで M.follow をラップし、追従 OFF の間は素通りさせる。
 -- 状態は vim.g.neotree_follow_enabled に持たせ、lualine からも色分けで参照する
--- （Copilot と同じく nil/未設定は ON 扱い）。
+-- （nil/未設定は ON 扱い）。
 local function ensure_follow_wrapped()
   local fs = require("neo-tree.sources.filesystem")
   if fs._follow_wrapped then
@@ -208,32 +208,6 @@ return {
         ["<right>"] = { neotree_open_folder, desc = "Tree: open folder" },
         -- ファイル追従（開いているファイルへ自動ジャンプ）の ON/OFF をトグル
         ["F"] = { neotree_toggle_follow, desc = "Tree: toggle follow current file" },
-        -- neo-tree カーソル下のノードを Copilot Chat に追加（d = directory）
-        --   ディレクトリ → #glob:<rel_path>/** でファイル一覧を渡す
-        --   ファイル     → #file:<path> でファイル内容を渡す
-        ["<leader>pd"] = {
-          function(state)
-            local node = state.tree:get_node()
-            if not node then
-              return
-            end
-            local path = node:get_id()
-            local cwd = vim.fn.getcwd()
-            -- cwd からの相対パスに変換
-            local rel = path
-            if path:sub(1, #cwd + 1) == cwd .. "/" then
-              rel = path:sub(#cwd + 2)
-            end
-            local resource
-            if node.type == "directory" then
-              resource = "glob:`" .. rel .. "/**`"
-            else
-              resource = "file:`" .. path .. "`"
-            end
-            require("CopilotChat").open({ resources = resource })
-          end,
-          desc = "Copilot: add node to chat",
-        },
       },
     },
     filesystem = {
