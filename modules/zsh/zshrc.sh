@@ -16,6 +16,20 @@ if [[ -n "$P10K_THEME_PATH" && -r "$P10K_THEME_PATH" ]]; then
 fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# herdr (Ghostty ベースの独自ターミナル) の VT 幅計算と p10k のマルチライン枠が
+# 噛み合わず、右端コネクタ (─╮ / ─╯) が正しい桁に載らずゴミ文字として取り残される
+# (罫線コーナーがプロンプト外の行に浮く症状)。$HERDR_PANE_ID が立つ herdr 内でのみ
+# 枠 (装飾) を無効化する。セグメント・powerline・アイコンは影響を受けない。
+# p10k はこれらのパラメータをプロンプト描画時に読むため source 後の上書きで有効。
+if [[ -n "$HERDR_PANE_ID" ]]; then
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=''
+fi
+
 # zsh-autosuggestions, zsh-syntax-highlighting, and completions
 # are now managed by home-manager (programs.zsh.autosuggestion / syntaxHighlighting)
 
