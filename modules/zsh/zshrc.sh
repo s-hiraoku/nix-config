@@ -217,9 +217,9 @@ fi
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
 
-# Ghostty shell integration — only outside tmux.
-# Inside tmux, Ghostty's PS1 marker injection (%{…%}) breaks p10k's nested
-# parameter expansions, causing literal ":-}}" to appear in the prompt.
-if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" ]]; then
+# Ghostty shell integration — only outside tmux/herdr.
+# Inside tmux (and herdr), Ghostty's PS1 marker injection (%{…%}) breaks p10k's
+# nested parameter expansions, causing literal ":-}}" to appear in the prompt.
+if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" && -z "$HERDR_ENV" ]]; then
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 fi
