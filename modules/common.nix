@@ -3,6 +3,7 @@
 {
   imports = [
     ./tmux.nix
+    ./herdr.nix
     ./lazygit.nix
     ./zsh.nix
     ./neovim.nix

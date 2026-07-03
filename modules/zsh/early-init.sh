@@ -1,14 +1,8 @@
-# Auto-start tmux in Ghostty (skip in nested tmux, VSCode, etc.)
-# MUST run before p10k instant prompt — p10k redirects file descriptors,
-# which breaks exec tmux and causes Ghostty to crash on launch.
-if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" && -z "$VSCODE_PID" && -z "$INSIDE_EMACS" ]]; then
-  if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-  fi
-  _last=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1)
-  _next=$(( ${_last:-0} + 1 ))
-  exec tmux new-session -s "$_next"
-fi
+# Ghostty ではマルチプレクサを自動起動しない。プレーンな shell で開き、
+# 必要に応じて自分で `tmux` または `herdr` を起動する (両方インストール済み)。
+# tmux の設定は modules/tmux.nix、herdr の設定は modules/herdr.nix に残してある。
+# (以前はここで `exec tmux new-session` して Ghostty=常に tmux にしていたが、
+#  herdr と併用したいため自動起動を廃止した。)
 
 # Powerlevel10k instant prompt — disabled to avoid rendering artifacts in tmux.
 # p10k's cached prompt replay conflicts with tmux's screen buffer management,

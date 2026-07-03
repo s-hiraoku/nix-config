@@ -1,0 +1,100 @@
+# herdr config.toml — tmux.nix からの移行用ドラフト
+#
+# 現状の modules/tmux.nix のキーバインドを可能な限り 1:1 で再現したもの。
+# ⚠️ マークの箇所は herdr 公式ドキュメントで確定できなかったため、実機検証が必要。
+#
+# 検証方法:
+#   1. brew install herdr
+#   2. このファイルを ~/.config/herdr/config.toml にコピー(または symlink)
+#   3. herdr 起動 → prefix + ? で全キーバインド一覧を確認
+#   4. 設定リロードは prefix + Shift+r
+#
+# 問題なければ modules/herdr.nix を作って home-manager で宣言的に管理する(次ステップ B)。
+
+# ─────────────────────────────────────────────
+# キーバインド
+# ─────────────────────────────────────────────
+[keys]
+# prefix を tmux と同じ Ctrl+A に(herdr デフォルトは ctrl+b)
+prefix = "ctrl+a"
+
+# ペイン分割(現在のパス引き継ぎは herdr デフォルト挙動を確認)
+# tmux: `|` = split-window -h(左右に分割) / `-` = split-window -v(上下に分割)
+# ⚠️ herdr の split_vertical / split_horizontal がどちらの向きか実機で要確認。
+#    想定: split_vertical = 左右分割 / split_horizontal = 上下分割
+split_vertical = "prefix+|"
+split_horizontal = "prefix+-"
+
+# 新規タブ(tmux の new-window 相当)
+new_tab = "prefix+c"
+
+# ペイン移動(Vim 風)
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# ペインズームイン/アウト
+zoom = "prefix+z"
+
+# ウィンドウ(タブ)移動
+# ⚠️ tmux では `bind -r p/n` でリピート(連打)可能だが、herdr にリピート相当の
+#    設定はドキュメント上見当たらない。単発移動になる想定。
+prev_tab = "prefix+p"
+next_tab = "prefix+n"
+
+# ペインリサイズ
+# ⚠️ tmux の `bind -r H/J/K/L resize-pane`(prefix 押しっぱなし連打)は再現不可。
+#    herdr は resize_mode に入ってから hjkl で連続調整する方式で代替する。
+#    → モード内のキーが hjkl かどうかは実機で要確認。
+resize_mode = "prefix+R"
+
+# 設定リロードは herdr ビルトインの prefix + Shift+r を使う(tmux の `bind r` 相当)。
+# → 別キーに変えたい場合のアクション名はドキュメントで要確認。
+
+# ─────────────────────────────────────────────
+# カスタムコマンド
+# ─────────────────────────────────────────────
+
+# tmux: `bind s` = fzf でセッション一覧から切り替えるポップアップ
+# herdr の Workspace が tmux の Session 相当。`workspace list` は JSON を返すので
+# jq で "id\t番号: ラベル" に整形し、fzf で選んで workspace_id で focus する。
+# (検証済み: workspace のサブコマンドは list/focus。switch は存在しない)
+[[keys.command]]
+key = "prefix+s"
+type = "pane"
+command = '''herdr workspace focus "$(herdr workspace list | jq -r '.result.workspaces[] | "\(.workspace_id)\t\(.number): \(.label)"' | fzf --delimiter='\t' --with-nth=2.. | cut -f1)"'''
+description = "fzf でワークスペース切替"
+
+# tmux: `bind S` = 現在パスのベース名で新規セッション作成
+# herdr は `workspace create --cwd ... --label ...`(--new は無い。検証済み)。
+# HERDR_ACTIVE_PANE_CWD はカスタムコマンドに渡される環境変数。
+[[keys.command]]
+key = "prefix+S"
+type = "shell"
+command = '''herdr workspace create --focus --cwd "$HERDR_ACTIVE_PANE_CWD" --label "$(basename "$HERDR_ACTIVE_PANE_CWD")"'''
+description = "現在パス名で新規ワークスペース"
+
+# ─────────────────────────────────────────────
+# テーマ(tmux の Catppuccin Mocha 風ステータスに対応)
+# ─────────────────────────────────────────────
+[theme]
+name = "catppuccin"
+
+# ─────────────────────────────────────────────
+# UI / マウス(tmux: set -g mouse on 相当)
+# ─────────────────────────────────────────────
+[ui]
+mouse = true
+
+# ─────────────────────────────────────────────
+# 未マッピング / 要確認メモ
+# ─────────────────────────────────────────────
+# - copy-mode の vi バインド(tmux: `v` で選択開始 / `y` で pbcopy):
+#   herdr にも copy_mode はあるが、モード内 v/y の pbcopy 連携が tmux と同じにできるか要検証。
+#   herdr はマウス選択でのコピーがネイティブなので、まずはそちらで運用してみるのも手。
+# - `unbind C-z`(suspend 無効化): herdr はそもそも suspend-client 相当が無い想定。実害があれば対応。
+# - focus-events / allow-passthrough(image.nvim の kitty graphics protocol):
+#   これは tmux 固有の設定。herdr はパススルーの扱いが異なるので、image.nvim が
+#   herdr 越しに動くかは別途 nvim で要確認(移行の最重要検証項目のひとつ)。
+# - baseIndex / pane-base-index / renumber-windows: herdr の採番仕様に依存。表示で確認。
