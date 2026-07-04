@@ -185,10 +185,10 @@ _terminal_context_title() {
 }
 
 _update_terminal_context_title() {
+  [[ -z "$GHOSTTY_RESOURCES_DIR" ]] && return
+
   local title
   title=$(_terminal_context_title)
-
-  [[ -z "$GHOSTTY_RESOURCES_DIR" ]] && return
   print -Pn "\e]0;${title}"
 }
 

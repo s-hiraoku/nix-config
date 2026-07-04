@@ -80,7 +80,7 @@ function M.move_buf_split(orientation)
   vim.api.nvim_set_current_win(new_win)
 end
 
--- ウィンドウのズーム トグル（tmux の prefix+z 相当）
+-- ウィンドウのズーム トグル（Herdr の prefix+z 相当）
 -- 現在ウィンドウを新規タブで最大化し、もう一度押すとタブを閉じて元のレイアウトに戻す。
 -- タブ＝ズーム用に使うので、ズーム中かどうかはタブ変数 t:zoomed で判定する。
 function M.toggle_zoom()
