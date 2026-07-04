@@ -11,7 +11,7 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     initContent = lib.mkMerge [
-      # tmux auto-start + p10k instant prompt: must run before compinit (order 570)
+      # Multiplexer startup policy + p10k instant prompt: must run before compinit (order 570)
       (lib.mkBefore (builtins.readFile ./zsh/early-init.sh))
       # Main configuration (default order 1000)
       ''

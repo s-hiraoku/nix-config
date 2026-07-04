@@ -18,7 +18,6 @@
   #
   # 起動は自動化せず、Ghostty のプレーン shell から手動で `herdr` する
   # (Ghostty の自動起動を廃止した経緯は modules/zsh/early-init.sh を参照)。
-  # tmux との併用可能: 手動で `tmux` / `herdr` を使い分ける。
 
   # 設定ファイルは ~/.config/herdr/config.toml。
   # 内容は modules/herdr/config.toml で管理し、home-manager が symlink を張る。

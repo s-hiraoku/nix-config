@@ -55,7 +55,7 @@ map("n", "n", "nzzzv", { desc = "Next search result (centered)" })
 map("n", "N", "Nzzzv", { desc = "Prev search result (centered)" })
 
 -- マクロ記録の暴発防止
--- IME 有効のまま tmux ペイン切替を失敗すると stray な `q`+レジスタ文字が紛れ込み、
+-- IME 有効のままマルチプレクサ操作を失敗すると stray な `q`+レジスタ文字が紛れ込み、
 -- 無音でマクロ記録が始まる→which-key がトリガーを suspend し続け、leader が効かなくなる。
 -- 素の q では記録を始めないようにし、意図的に記録したいときだけ <leader>Q を使う。
 map("n", "q", "<Nop>", { desc = "Disabled (macro record暴発防止 / 記録は <leader>Q)" })
@@ -103,7 +103,7 @@ map("x", "<leader>tw", "St", { remap = true, desc = "Wrap selection in HTML/JSX 
 --   ^R ^T ^V → nvim 標準を温存
 map("i", "<C-k>", "<C-o>D", { desc = "Kill to end of line (zsh ^K)" })
 map("i", "<C-d>", "<C-o>dw", { desc = "Kill word forward (zsh ^D) ※insert の dedent を上書き" })
--- ^A=行頭。tmux prefix(C-a) と競合するため tmux 内では C-a C-a の2回押しで届く
+-- ^A=行頭。Herdr prefix(C-a) と同じキーなので、Herdr 内では prefix として扱われない文脈で使う。
 map("i", "<C-a>", "<Home>", { desc = "Beginning of line (zsh ^A)" })
 
 -- insert モードのまま現在行をコメントトグル（Comment.nvim の gcc を <C-o> で1発実行）

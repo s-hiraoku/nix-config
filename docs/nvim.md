@@ -81,7 +81,7 @@ modules/nvim/
 | `<C-h>` / `<C-j>` / `<C-k>` / `<C-l>` | 左 / 下 / 上 / 右のウィンドウへ移動 |
 | `<leader>wq` | ウィンドウを閉じてバッファも削除（最後の 1 つなら警告して閉じない） |
 | `<leader>wc` | ウィンドウを閉じる（バッファは残す） |
-| `<leader>z` | ウィンドウのズーム トグル（新規タブで最大化、再押下で戻す。tmux prefix+z 相当） |
+| `<leader>z` | ウィンドウのズーム トグル（新規タブで最大化、再押下で戻す。Herdr prefix+z 相当） |
 | `<leader>qa` | 全て終了 (`:qa`) |
 
 ### バッファ
@@ -129,7 +129,7 @@ modules/nvim/
 |-----|------|
 | `<C-k>` | 行末まで削除（zsh `^K`） |
 | `<C-d>` | 前方の単語を削除（zsh `^D`） |
-| `<C-a>` | 行頭へ（zsh `^A`。tmux prefix と競合、tmux 内では `C-a C-a`） |
+| `<C-a>` | 行頭へ（zsh `^A`。Herdr prefix と競合するため、Herdr 内では prefix ではなく insert mode の `<C-a>` として届く場面で使う） |
 | `<C-_>` | 現在行のコメントトグル（端末で `^/` は `^_` として届く） |
 
 ### 診断 (diagnostics)
@@ -152,7 +152,7 @@ modules/nvim/
 
 | Key | 動作 |
 |-----|------|
-| `q` | **無効化**（IME / tmux 誤操作による記録暴発を防ぐ） |
+| `q` | **無効化**（IME / マルチプレクサ操作ミスによる記録暴発を防ぐ） |
 
 > 意図的なマクロ記録の割り当ては現状コメントアウトで未定義。
 
@@ -383,7 +383,7 @@ insert では `<C-_>`（= `^/`）で現在行トグル。
 - **nvim-treesitter** — 構文解析・ハイライト・fold。対象パーサーは ts/js/tsx/python/lua/json/yaml/html/css/markdown/bash 等。未導入言語は自動インストール
 - **render-markdown.nvim** — nvim 内で Markdown をリッチ表示（見出しアイコン・コードブロック背景・チェックボックス・表）。`<leader>mp` でトグル
 - **markdown-preview.nvim** — ブラウザでライブプレビュー（スクロール同期）。`<leader>mv` でトグル
-- **image.nvim** — nvim 内で画像・Markdown 内画像をインライン表示。kitty graphics protocol（**ghostty 等の対応端末**）+ ImageMagick が必要。tmux 越しは `allow-passthrough on`（設定済み）
+- **image.nvim** — nvim 内で画像・Markdown 内画像をインライン表示。kitty graphics protocol（**Ghostty 等の対応端末**）+ ImageMagick が必要
 
 ---
 
