@@ -126,7 +126,7 @@ ll() { eza -l -g --icons --git --header "${@:-.}"; }
 la() { eza -la -g --icons --git --header "${@:-.}"; }
 alias lt='eza --tree --level=2 --icons'
 
-# tmux/ghostty pane titles
+# Terminal title context
 _codex_shorten_middle() {
   local input="$1"
   local max_len="${2:-32}"
@@ -142,12 +142,12 @@ _codex_shorten_middle() {
   printf '%s...%s' "${input[1,left]}" "${input[-right,-1]}"
 }
 
-_tmux_context_host() {
+_terminal_context_host() {
   [[ -z "$SSH_CONNECTION" ]] && return
   hostname -s 2>/dev/null || printf '%s' "${HOST%%.*}"
 }
 
-_tmux_context_label() {
+_terminal_context_label() {
   local branch=""
   local root=""
   local sha=""
@@ -170,12 +170,12 @@ _tmux_context_label() {
   printf '%s' "$(_codex_shorten_middle "${PWD:t}" 24)"
 }
 
-_tmux_context_title() {
+_terminal_context_title() {
   local host=""
   local label=""
 
-  host=$(_tmux_context_host)
-  label=$(_tmux_context_label)
+  host=$(_terminal_context_host)
+  label=$(_terminal_context_label)
 
   if [[ -n "$host" ]]; then
     printf '%s:%s' "$host" "$label"
@@ -186,12 +186,7 @@ _tmux_context_title() {
 
 _update_terminal_context_title() {
   local title
-  title=$(_tmux_context_title)
-
-  if [[ -n "$TMUX" ]]; then
-    tmux select-pane -T "$title" >/dev/null 2>&1 || true
-    return
-  fi
+  title=$(_terminal_context_title)
 
   [[ -z "$GHOSTTY_RESOURCES_DIR" ]] && return
   print -Pn "\e]0;${title}"
@@ -217,9 +212,9 @@ fi
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
 
-# Ghostty shell integration — only outside tmux/herdr.
-# Inside tmux (and herdr), Ghostty's PS1 marker injection (%{…%}) breaks p10k's
+# Ghostty shell integration — only outside Herdr.
+# Inside Herdr, Ghostty's PS1 marker injection (%{…%}) breaks p10k's
 # nested parameter expansions, causing literal ":-}}" to appear in the prompt.
-if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$TMUX" && -z "$HERDR_ENV" ]]; then
+if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$HERDR_ENV" ]]; then
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 fi

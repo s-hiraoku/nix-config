@@ -19,7 +19,8 @@ nix-config/
     ├── hosts/             # ホスト軸: どの物理マシンか
     │   ├── personal-mbp.nix    # 個人 MacBook (外付け SSD の ghq path 等)
     │   └── work-pc05481.nix    # 会社 PC (Cato Root CA, ssl-cert-file 等)
-    ├── tmux.nix           # tmux 設定
+    ├── herdr.nix          # Herdr 設定
+    ├── herdr/             # Herdr config.toml
     ├── lazygit.nix        # lazygit 設定
     ├── zsh.nix            # zsh 設定
     ├── neovim.nix         # neovim 設定
@@ -295,7 +296,7 @@ sops secrets/secrets.yaml
 home-manager が既存ファイルとの衝突を検知した場合、既存ファイルをバックアップしてから再実行する:
 
 ```sh
-mv ~/.config/tmux/tmux.conf ~/.config/tmux/tmux.conf.bak
+mv ~/.config/herdr/config.toml ~/.config/herdr/config.toml.bak
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
 

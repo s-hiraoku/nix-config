@@ -4,7 +4,7 @@
   programs.ghostty = {
     enable = true;
     package = null;
-    # Zsh integration is manually sourced in zshrc.sh (only outside tmux)
+    # Zsh integration is manually sourced in zshrc.sh (only outside Herdr)
     # because Ghostty's PS1 marker injection breaks p10k's nested parameter expansions.
     enableZshIntegration = false;
     settings = {
