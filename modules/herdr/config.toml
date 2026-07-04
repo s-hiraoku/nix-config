@@ -22,7 +22,8 @@ reload_config = "prefix+r"
 
 # ペイン分割 (現在のパス引き継ぎは Herdr 側の new_cwd/follow に任せる)
 # Herdr: split_vertical = 左右分割 / split_horizontal = 上下分割
-split_vertical = ["prefix+|", "prefix+v"]
+# `|` は terminal/keyboard protocol によって `shift+backslash` として届くため両方を許可する。
+split_vertical = ["prefix+|", "prefix+shift+backslash", "prefix+v"]
 split_horizontal = "prefix+minus"
 
 # 新規タブ
