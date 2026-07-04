@@ -18,6 +18,10 @@
       # Neovimのautoread等のために必要
       set -g focus-events on
 
+      # image.nvim 等が kitty graphics protocol を tmux 越しに使えるようにする
+      # （外側の端末 wezterm / ghostty が kitty protocol 対応）
+      set -gq allow-passthrough on
+
       # ペインも1始まり
       set -g pane-base-index 1
       set -g renumber-windows on

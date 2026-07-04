@@ -1,0 +1,14 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "user-words",
+      "path": "./custom-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["user-words"],
+  "allowCompoundWords": true,
+  "ignoreRegExpList": ["/0x[0-9a-fA-F]+/", "/#[0-9a-fA-F]{3,8}\\b/"]
+}
