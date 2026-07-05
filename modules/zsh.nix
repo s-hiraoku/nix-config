@@ -1,10 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  programs.fzf = {
-    enable = true;
-    enableZshIntegration = true;
-  };
+  # fzf は common.nix の programs.fzf で有効化済み (zsh integration 込み)。
 
   programs.zsh = {
     enable = true;
