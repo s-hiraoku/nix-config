@@ -2,11 +2,11 @@
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
-  dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin/nvim" },
+  dependencies = { "nvim-tree/nvim-web-devicons", "rebelot/kanagawa.nvim" },
   config = function()
     require("lualine").setup({
       options = {
-        theme = "catppuccin-macchiato",
+        theme = "kanagawa",
         component_separators = "|",
         section_separators = { left = "", right = "" },
         -- ステータスラインを画面全体で1本にする（ウィンドウ幅に依存しない）
@@ -25,7 +25,7 @@ return {
               return vim.g.neotree_follow_enabled ~= false and "󰈈" or "󰈉"
             end,
             color = function()
-              return { fg = vim.g.neotree_follow_enabled ~= false and "#a6da95" or "#6e738d" }
+              return { fg = vim.g.neotree_follow_enabled ~= false and "#98bb6c" or "#727169" }
             end,
           },
           "branch",
@@ -41,7 +41,7 @@ return {
               return "󰓆"
             end,
             color = function()
-              return { fg = vim.opt_local.spell:get() and "#a6da95" or "#6e738d" }
+              return { fg = vim.opt_local.spell:get() and "#98bb6c" or "#727169" }
             end,
           },
           -- wrap の ON/OFF（<leader>tr）: 󰖶 ON(点灯色) / 󰯟 OFF(消灯色)
@@ -50,14 +50,14 @@ return {
               return vim.opt_local.wrap:get() and "󰖶" or "󰯟"
             end,
             color = function()
-              return { fg = vim.opt_local.wrap:get() and "#a6da95" or "#6e738d" }
+              return { fg = vim.opt_local.wrap:get() and "#98bb6c" or "#727169" }
             end,
           },
           -- lazy.nvim のアップデート件数を右側に表示
           {
             require("lazy.status").updates,
             cond = require("lazy.status").has_updates,
-            color = { fg = "#ff9e64" },
+            color = { fg = "#ffa066" },
           },
           "encoding",
           "fileformat",
@@ -74,7 +74,7 @@ return {
             cond = function()
               return #vim.lsp.get_clients({ bufnr = 0 }) > 0
             end,
-            color = { fg = "#8aadf4" },
+            color = { fg = "#7fb4ca" },
           },
         },
         lualine_y = { "progress" },

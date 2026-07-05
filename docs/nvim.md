@@ -4,7 +4,7 @@
 
 - **リーダーキー**: `,` (comma) / **ローカルリーダー**: `\`
 - **プラグインマネージャ**: [lazy.nvim](https://github.com/folke/lazy.nvim)（プラグイン本体はランタイム管理）
-- **カラースキーム**: Catppuccin Macchiato（透過背景）
+- **カラースキーム**: Kanagawa Wave（透過背景）
 - **管理方法**: Nix home-manager が `modules/nvim/` を `~/.config/nvim` へ symlink（詳細は [構成とメンテナンス](#構成とメンテナンス)）
 
 > キーバインドが思い出せないときは **`,fk`**（Telescope keymaps 検索）か、`,` を押して少し待つと出る **which-key** ポップアップが早い。
@@ -44,7 +44,6 @@ modules/nvim/
 │   │   └── ui.lua              # hover / 診断アイコン等の見た目
 │   └── plugins/                # 各プラグインの spec（1 ファイル 1 テーマ）
 ├── dic/                        # スペルチェック辞書（cspell + native spell シード）
-└── aa-dashboard.txt            # alpha ダッシュボードのヘッダーアート
 ```
 
 ---
@@ -370,13 +369,13 @@ insert では `<C-_>`（= `^/`）で現在行トグル。
 
 ### UI / 表示
 
-- **catppuccin** — カラースキーム（Macchiato、透過背景）
+- **kanagawa.nvim** — カラースキーム（Wave、透過背景）
 - **bufferline.nvim** — 上部のバッファタブ（`<Tab>`/`<S-Tab>` で移動）
 - **lualine.nvim** — 下部ステータスライン。Neo-tree 追従・git branch/diff・診断・spell・wrap・lazy 更新件数・LSP サーバ名・行数を表示
 - **noice.nvim** — `:` コマンドをフロート表示 & 入力サジェスト。`<leader>snh`（履歴）/ `<leader>sna`（全メッセージ）/ `<leader>snd`（通知クリア）
 - **indent-blankline.nvim** — インデントガイド（`▏`）
 - **which-key.nvim** — キー入力途中でバインド一覧をポップアップ（helix プリセット）
-- **alpha-nvim** — 引数なし起動時のダッシュボード。`f`=検索 / `r`=最近 / `g`=grep / `e`=新規 / `h`=checkhealth / `?`=help / `q`=終了
+- **alpha-nvim** — 引数なし起動時のダッシュボード。ヘッダーは `ascii.nvim` の `art.text.neovim.sharp`。`f`=検索 / `r`=最近 / `g`=grep / `e`=新規 / `h`=checkhealth / `?`=help / `q`=終了
 
 ### 言語 / Markdown / 画像
 

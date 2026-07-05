@@ -2,7 +2,7 @@ nvim
 neovim
 treesitter
 lua
-catppuccin
+kanagawa
 macchiato
 lualine
 tailwind

@@ -17,7 +17,7 @@ return {
     vim.g.VM_set_statusline = 3
     -- Insert モード終了（Esc）で VM モードも終了
     vim.g.VM_quit_after_leaving_insert_mode = 1
-    -- カーソル位置を Catppuccin Macchiato に映える色で明示
+    -- カーソル位置を Kanagawa Wave に映える色で明示
     vim.api.nvim_create_autocmd("ColorScheme", {
       pattern = "*",
       callback = function()

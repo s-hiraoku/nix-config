@@ -218,3 +218,13 @@ fi
 if [[ -n "$GHOSTTY_RESOURCES_DIR" && -z "$HERDR_ENV" ]]; then
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 fi
+
+# Home Manager loads fzf's zsh integration before the custom init block, but in
+# some terminal/multiplexer startup paths ^R can remain zsh's default redisplay.
+# Re-source fzf late and make the history widget binding explicit.
+if [[ -o interactive ]] && command -v fzf >/dev/null 2>&1; then
+  if ! zle -l | grep -qx 'fzf-history-widget'; then
+    source <(fzf --zsh)
+  fi
+  bindkey '^R' fzf-history-widget
+fi

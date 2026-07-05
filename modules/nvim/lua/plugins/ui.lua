@@ -1,5 +1,5 @@
 -- UI 関連プラグインの束（小さめのものをまとめる）
--- 大きい catppuccin / lualine は別ファイルに分離している。
+-- 大きい kanagawa / lualine は別ファイルに分離している。
 return {
   -- バッファタブ
   {

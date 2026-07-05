@@ -2,39 +2,25 @@
 -- nvim を引数なしで起動したときのみ表示
 return {
   "goolord/alpha-nvim",
+  dependencies = {
+    "MaximilianLloyd/ascii.nvim",
+  },
   event = "VimEnter",
   cond = function()
     return vim.fn.argc() == 0
   end,
   config = function()
     local alpha = require("alpha")
+    local ascii = require("ascii")
     local dashboard = require("alpha.themes.dashboard")
 
-    -- Catppuccin Macchiato カラー
-    vim.api.nvim_set_hl(0, "AlphaHeader", { fg = "#c6a0f6" }) -- mauve
-    vim.api.nvim_set_hl(0, "AlphaShortcut", { fg = "#8aadf4" }) -- blue
-    vim.api.nvim_set_hl(0, "AlphaButtons", { fg = "#cad3f5" }) -- text
-    vim.api.nvim_set_hl(0, "AlphaFooter", { fg = "#6e738d" }) -- overlay0
+    -- Kanagawa Wave カラー
+    vim.api.nvim_set_hl(0, "AlphaHeader", { fg = "#7e9cd8" }) -- crystalBlue
+    vim.api.nvim_set_hl(0, "AlphaShortcut", { fg = "#7fb4ca" }) -- springBlue
+    vim.api.nvim_set_hl(0, "AlphaButtons", { fg = "#dcd7ba" }) -- fujiWhite
+    vim.api.nvim_set_hl(0, "AlphaFooter", { fg = "#727169" }) -- fujiGray
 
-    -- ──────────────────────────────────────
-    -- ヘッダー: aa-dashboard.txt をそのまま読み込む
-    -- レイアウト変更はテキストファイル側を編集する
-    -- ──────────────────────────────────────
-    local function read_header()
-      local path = vim.fn.stdpath("config") .. "/aa-dashboard.txt"
-      local lines = {}
-      local f = io.open(path, "r")
-      if f then
-        for line in f:lines() do
-          -- 末尾の通常スペースのみ除去（ブレイル空白は保持）
-          table.insert(lines, (line:gsub("%s+$", "")))
-        end
-        f:close()
-      end
-      return lines
-    end
-
-    local header_lines = read_header()
+    local header_lines = ascii.art.text.neovim.sharp
     dashboard.section.header.val = header_lines
     dashboard.section.header.opts.hl = "AlphaHeader"
 
