@@ -9,7 +9,8 @@
     enableZshIntegration = false;
     settings = {
       # Appearance
-      theme = "TokyoNight Night";
+      # nvim / tmux / lualine と揃えて Kanagawa Wave に統一する (Ghostty 同梱テーマ)。
+      theme = "Kanagawa Wave";
       window-theme = "dark";
       background = "#000000";
       background-opacity = 0.7;

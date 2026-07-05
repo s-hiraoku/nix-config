@@ -33,14 +33,19 @@ fi
 # zsh-autosuggestions, zsh-syntax-highlighting, and completions
 # are now managed by home-manager (programs.zsh.autosuggestion / syntaxHighlighting)
 
-# PATH additions
-export PATH="$PATH:$HOME/.cache/lm-studio/bin"
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/opt/homebrew/opt/postgresql@14/bin:$PATH"
-export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-export PATH="$PATH:$HOME/Library/Python/3.11/bin"
-export PATH="$HOME/.cargo/bin:$PATH"
+# PATH additions — ディレクトリが存在するものだけ追加する。
+# マシンによって入っていないツール (postgresql@14 / Docker / VS Code 等) の
+# 死んだ PATH エントリを作らないため。
+_path_prepend() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }
+_path_append()  { [[ -d "$1" ]] && export PATH="$PATH:$1"; }
+
+_path_append  "$HOME/.cache/lm-studio/bin"
+_path_prepend "$HOME/.local/bin"
+_path_prepend "/opt/homebrew/opt/postgresql@14/bin"
+_path_prepend "/Applications/Docker.app/Contents/Resources/bin"
+_path_append  "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+_path_append  "$HOME/Library/Python/3.11/bin"
+_path_prepend "$HOME/.cargo/bin"
 
 # Local env
 [[ -r "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
@@ -49,13 +54,23 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export MCP_CONFIG_FILE="$HOME/.config/claude-code/mcp.json"
 
 # Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+if [[ -d "$HOME/.bun" ]]; then
+  export BUN_INSTALL="$HOME/.bun"
+  _path_prepend "$BUN_INSTALL/bin"
+  [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+fi
 
-# Volta
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+# Volta — ランタイム管理の役割分担:
+#   Volta: Node 本体 + npm/pnpm + グローバル CLI (copilot, playwright-cli 等)
+#   mise : ruby / erlang / elixir
+# Node を mise へ一本化する場合は docs/runtime-managers.md の手順で移行し、
+# このブロックを削除する。
+if [[ -d "$HOME/.volta/bin" ]]; then
+  export VOLTA_HOME="$HOME/.volta"
+  _path_prepend "$VOLTA_HOME/bin"
+fi
+
+unfunction _path_prepend _path_append
 
 # ghq-fzf
 function ghq-fzf() {
@@ -204,10 +219,38 @@ if command -v mise &>/dev/null; then
   eval "$(mise activate zsh)"
 fi
 
-# Load encrypted secrets (sops + age)
-if command -v load-secrets &>/dev/null && [[ -f "${SOPS_SECRETS_FILE:-$HOME/nix-config/secrets/secrets.yaml}" ]]; then
-  eval "$(load-secrets)"
+# Load encrypted secrets (sops + age) — 復号は環境ごとに 1 度だけ。
+# tmux / herdr のペインや子 shell は親の環境変数を継承しているので、
+# NIX_SECRETS_LOADED が立っていれば sops 復号 (数百 ms) をスキップして
+# 起動を速くする。secrets を更新した直後は新しいトップレベル shell を
+# 開くか、`unset NIX_SECRETS_LOADED && eval "$(load-secrets)"` で再読込。
+if [[ -z "$NIX_SECRETS_LOADED" ]] && command -v load-secrets &>/dev/null \
+  && [[ -f "${SOPS_SECRETS_FILE:-$HOME/nix-config/secrets/secrets.yaml}" ]]; then
+  if _secrets_env=$(load-secrets); then
+    eval "$_secrets_env"
+    export NIX_SECRETS_LOADED=1
+  fi
+  unset _secrets_env
 fi
+
+# hms: このマシンに対応する Home Manager 構成を switch する。
+# flake attr のホスト分岐を覚えなくて済むよう、hostname で自動判定する。
+hms() {
+  local flake_dir="${NIX_CONFIG_DIR:-$HOME/nix-config}"
+  local attr="hiraoku.shinichi"
+  case "$(hostname -s)" in
+    PC-05481) attr="hiraoku.shinichi@PC-05481" ;;
+  esac
+  home-manager switch --flake "${flake_dir}#${attr}" "$@"
+}
+
+# hmu: nixpkgs を更新して switch し、flake.lock の差分を表示する。
+# `nix flake lock --update-input` は Nix 2.19 より前の CLI でも動く
+# 後方互換フォーム (`nix flake update <input>` は 2.19+ が必要)。
+hmu() {
+  local flake_dir="${NIX_CONFIG_DIR:-$HOME/nix-config}"
+  nix flake lock --update-input nixpkgs --flake "$flake_dir" && hms && git -C "$flake_dir" diff flake.lock
+}
 
 # Vite+ bin (https://viteplus.dev)
 [[ -r "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"

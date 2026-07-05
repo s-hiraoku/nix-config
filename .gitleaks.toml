@@ -1,0 +1,12 @@
+# gitleaks 設定
+# sops で暗号化済みのファイルは ENC[AES256_GCM,...] 形式の高エントロピー文字列を
+# 含むため誤検知しやすい。暗号化済みであることは CLAUDE.md のコミット前チェックと
+# レビューで担保し、ここではスキャン対象から外す。
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+  '''secrets/.*\.yaml$''',
+]
