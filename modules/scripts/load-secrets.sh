@@ -32,7 +32,10 @@ fi
 
 # %q でシェル安全にクォートする。値に空白・$・; などのメタ文字が
 # 含まれていても eval で壊れたり実行されたりしない。
+# key 自体は %q でクォートされないため、シェル識別子として妥当なものだけ
+# 通す (= や空白を含む不正なキーが export 文を壊すのを防ぐ)。
 while IFS='=' read -r key value; do
   [[ -z "$key" || "$key" =~ ^# ]] && continue
+  [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
   printf 'export %s=%q\n' "$key" "$value"
 done <<<"$DECRYPTED"

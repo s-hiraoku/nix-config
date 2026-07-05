@@ -245,9 +245,11 @@ hms() {
 }
 
 # hmu: nixpkgs を更新して switch し、flake.lock の差分を表示する。
+# `nix flake lock --update-input` は Nix 2.19 より前の CLI でも動く
+# 後方互換フォーム (`nix flake update <input>` は 2.19+ が必要)。
 hmu() {
   local flake_dir="${NIX_CONFIG_DIR:-$HOME/nix-config}"
-  nix flake update nixpkgs --flake "$flake_dir" && hms && git -C "$flake_dir" diff flake.lock
+  nix flake lock --update-input nixpkgs --flake "$flake_dir" && hms && git -C "$flake_dir" diff flake.lock
 }
 
 # Vite+ bin (https://viteplus.dev)
