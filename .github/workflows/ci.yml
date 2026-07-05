@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  # 両方の Home Manager 構成が評価できることを確認する。
+  # aarch64-darwin 向けの構成だが、評価 (eval) だけならビルド不要なので
+  # ubuntu ランナーで実行できる。
+  flake-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - name: Evaluate personal configuration
+        run: nix eval '.#homeConfigurations."hiraoku.shinichi".activationPackage.drvPath'
+      - name: Evaluate work configuration
+        run: nix eval '.#homeConfigurations."hiraoku.shinichi@PC-05481".activationPackage.drvPath'
+
+  # 公開リポジトリなので、秘密情報の混入を PR ごとに自動スキャンする。
+  # sops 暗号化済みの secrets/*.yaml は .gitleaks.toml で除外している。
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
