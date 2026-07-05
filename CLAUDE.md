@@ -28,8 +28,10 @@ Conventional Commits 形式。スコープがある場合は付ける。例:
 1. `git switch -c <branch>` でブランチを切る
 2. 作業してコミット
 3. push してブランチをリモートに上げる
-4. `gh pr create --base main` で PR を作成 (`.github/pull_request_template.md` が自動で適用される)
+4. `gh pr create --base main` で ready-for-review PR を作成 (`.github/pull_request_template.md` が自動で適用される)
 5. 自己レビューの後、GitHub 上でマージ
+
+draft PR は明示的に依頼された場合だけ作成する。通常は `--draft` を付けない。
 
 ### push / PR 作成コマンド
 
@@ -48,3 +50,19 @@ gh pr create --base main
 GH_TOKEN=$(gh auth token -u s-hiraoku) git push -u origin <branch>
 GH_TOKEN=$(gh auth token -u s-hiraoku) gh pr create --base main
 ```
+
+`GH_TOKEN=$(gh auth token -u s-hiraoku)` はコマンド実行時だけ token を環境変数に渡すための書き方。token の値をファイルやコミットメッセージに残さない。
+
+## 公開リポジトリとしての確認
+
+このリポジトリは public。コミット前に以下を確認する。
+
+```bash
+git status --short
+git diff --check
+git diff --cached
+rg -n "BEGIN (RSA|OPENSSH|EC|DSA|PRIVATE)|github_pat_|ghp_[A-Za-z0-9_]+|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}" .
+rg -n "(password|passwd|secret|token|api[_-]?key|private[_-]?key)" .
+```
+
+`secrets/secrets.yaml` は sops 暗号化済みなら Git 管理してよい。age の秘密鍵、復号済み secrets、証明書、`.env`、API token はコミットしない。詳細は `docs/public-repo.md`。

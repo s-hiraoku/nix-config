@@ -1,51 +1,68 @@
 # nix-config
 
-Nix Home Manager による開発環境の構成管理。
+Nix Home Manager で macOS の開発環境を管理するリポジトリ。
+
+このリポジトリは公開リポジトリとして運用しているため、秘密情報は sops + age で暗号化し、平文の鍵・証明書・トークンはコミットしない。
+
+## 現在の方針
+
+- Home Manager で dotfiles と CLI ツールを共通管理する。
+- 設定は **account** と **host** の 2 軸で分ける。
+- Herdr は会社環境・個人環境で共通設定にする。
+- Ghostty 起動時に Herdr は自動起動しない。必要な時だけ手動で `herdr` を実行する。
+- Herdr 本体は Homebrew で入れ、Nix では設定ファイルだけ管理する。
+- Neovim は Kanagawa Wave を標準テーマにする。
 
 ## 構成
 
-設定は **account (誰として使うか)** と **host (どのマシンか)** の 2 軸で分割している。
-`flake.nix` で `common + accounts/<name> + hosts/<name>` を組み合わせて 1 つのホスト構成を作る。
+`flake.nix` で `common + accounts/<name> + hosts/<name>` を組み合わせて Home Manager 構成を作る。
 
 ```
 nix-config/
-├── flake.nix              # ホスト構成 (account × host の組み合わせ)
-├── flake.lock             # 依存関係のバージョン固定
-└── modules/
-    ├── common.nix         # 全環境共通 (パッケージ、git 共通設定 等)
-    ├── accounts/          # アカウント軸: 誰として使うか
-    │   ├── personal.nix   # 個人アカウント (git email, lazygit プロンプト英語)
-    │   └── work.nix       # 会社アカウント (git email, JDK17, lazygit プロンプト日本語)
-    ├── hosts/             # ホスト軸: どの物理マシンか
-    │   ├── personal-mbp.nix    # 個人 MacBook (外付け SSD の ghq path 等)
-    │   └── work-pc05481.nix    # 会社 PC (Cato Root CA, ssl-cert-file 等)
-    ├── herdr.nix          # Herdr 設定
-    ├── herdr/             # Herdr config.toml
-    ├── lazygit.nix        # lazygit 設定
-    ├── zsh.nix            # zsh 設定
-    ├── neovim.nix         # neovim 設定
-    ├── ghostty.nix        # ghostty 設定
-    ├── nvim/              # neovim Lua ファイル
-    ├── zsh/               # zsh スクリプト
-    └── scripts/           # ユーティリティスクリプト
+├── flake.nix                    # Home Manager 構成の組み立て
+├── flake.lock                   # nixpkgs / home-manager の固定
+├── modules/
+│   ├── common.nix               # 全環境共通
+│   ├── accounts/                # アカウント単位の差分
+│   │   ├── personal.nix         # 個人用 git email 等
+│   │   └── work.nix             # 会社用 git email / JDK / lazygit 設定等
+│   ├── hosts/                   # 物理マシン単位の差分
+│   │   ├── personal-mbp.nix     # 個人 MacBook 固有設定
+│   │   └── work-pc05481.nix     # 会社 PC 固有設定
+│   ├── herdr.nix                # Herdr config.toml の配置
+│   ├── herdr/config.toml        # Herdr キーバインド
+│   ├── ghostty.nix              # Ghostty 設定
+│   ├── lazygit.nix              # lazygit 設定
+│   ├── neovim.nix               # Neovim Home Manager 設定
+│   ├── nvim/                    # Neovim Lua 設定
+│   ├── nvim-seeds/              # lazy-lock / spell seed
+│   ├── zsh.nix                  # zsh Home Manager 設定
+│   ├── zsh/                     # zsh 初期化スクリプト
+│   └── scripts/                 # 補助スクリプト
+├── docs/
+│   ├── herdr.md                 # Herdr 運用メモ
+│   ├── nvim.md                  # Neovim 設定マニュアル
+│   └── public-repo.md           # 公開リポジトリとしての注意
+└── secrets/
+    └── secrets.yaml             # sops で暗号化した秘密情報
 ```
 
-### 2 軸分割の意図
+## account / host の分け方
 
-|  | 個人アカウント | 会社アカウント |
+| 構成 | account | host |
 |---|---|---|
-| **個人 MBP** | `accounts/personal` + `hosts/personal-mbp` | — |
-| **会社 PC-05481** | — | `accounts/work` + `hosts/work-pc05481` |
+| 個人 MacBook | `modules/accounts/personal.nix` | `modules/hosts/personal-mbp.nix` |
+| 会社 PC | `modules/accounts/work.nix` | `modules/hosts/work-pc05481.nix` |
 
-- **account** は買い替えても変わらない (メールアドレス、コミット言語、業務用パッケージ)
-- **host** はマシン固有 (外付け SSD のパス、社内ネットワークの証明書ファイル位置)
+- **account**: マシンを買い替えても変わらない設定。例: git email、仕事用/個人用の言語やツール設定。
+- **host**: 物理マシンに依存する設定。例: 外付け SSD のパス、社内ネットワーク用 CA 証明書の場所。
+- **common**: 個人・会社の両方で使う設定。例: Herdr、Neovim、zsh、Ghostty、共通 CLI。
 
-新しい個人 PC を買った時は `hosts/personal-mbpN.nix` を 1 ファイル追加するだけで、
-`accounts/personal.nix` をそのまま再利用できる。
+判断に迷ったら「同じアカウントで新しい Mac に移っても使い回すか」で分ける。使い回すなら `accounts/`、そのマシン固有なら `hosts/`。
 
 ## セットアップ
 
-### 1. Nix のインストール
+### 1. Nix をインストール
 
 ```sh
 sh <(curl -L https://nixos.org/nix/install)
@@ -53,283 +70,287 @@ sh <(curl -L https://nixos.org/nix/install)
 
 インストール後、ターミナルを再起動する。
 
-### 2. リポジトリのクローンと適用
+### 2. リポジトリを取得
 
 ```sh
 git clone https://github.com/s-hiraoku/nix-config.git
 cd nix-config
 ```
 
-個人 PC の場合:
+### 3. Home Manager を適用
+
+個人 MacBook:
 
 ```sh
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
 
-会社 PC の場合:
+会社 PC:
 
 ```sh
 home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
-## 環境の切り替え
-
-同じ PC で環境を切り替えたい場合は、対応するコマンドを再実行するだけで切り替わる。
+`home-manager` がまだ PATH にない場合:
 
 ```sh
-# 個人用に切り替え
+nix run home-manager -- switch --flake '.#hiraoku.shinichi'
+nix run home-manager -- switch --flake '.#hiraoku.shinichi@PC-05481'
+```
+
+## 日常運用
+
+### 設定変更を適用する
+
+```sh
 home-manager switch --flake '.#hiraoku.shinichi'
+```
 
-# 会社用に切り替え
+会社 PC:
+
+```sh
 home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
-## アップデート
+### PR マージ後にこの PC へ反映する
 
-### 仕組み
+```sh
+cd ~/nix-config
+git pull --ff-only
+home-manager switch --flake '.#hiraoku.shinichi'
+```
 
-Nix で管理しているツールのバージョンは `flake.lock` に固定された **nixpkgs のリビジョン**に紐づく。
-個別ツールだけ最新にするのではなく、「nixpkgs 全体を新しいリビジョンに上げる → そこに含まれる全ツールが新しくなる」という流れ。
+サンドボックス環境などで Nix の cache 書き込みが制限される場合:
 
-### よく使うコマンド
+```sh
+XDG_CACHE_HOME=/private/tmp/codex-nix-cache home-manager switch --flake '.#hiraoku.shinichi'
+```
 
-| やりたいこと | コマンド |
+## Herdr
+
+Herdr は tmux からの移行先として共通設定にしている。会社環境・個人環境のどちらにも `modules/common.nix` 経由で入る。
+
+本体は Nix flake では入れない。Darwin では nixpkgs 版 Herdr のソースビルドが失敗するため、現時点では Homebrew で導入し、設定だけ Home Manager で管理する。
+
+```sh
+brew install herdr
+```
+
+起動:
+
+```sh
+herdr
+```
+
+Ghostty 起動時の自動 Herdr 起動は無効。プレーンな shell を開いてから、必要な時だけ手動で `herdr` を起動する。
+
+主要キー:
+
+| Key | 動作 |
 |---|---|
-| 特定ツールの新版が欲しい (nixpkgs だけ更新) | `nix flake update nixpkgs` |
-| 全 input を最新化 (月 1 メンテ的に) | `nix flake update` |
-| 設定変更や `flake.lock` 更新の適用 | `home-manager switch --flake '.#hiraoku.shinichi'` |
+| `Ctrl-a ?` | ヘルプ |
+| `Ctrl-a r` | 設定リロード |
+| `Ctrl-a \|` / `Ctrl-a Shift-\` / `Ctrl-a v` | 左右分割 |
+| `Ctrl-a -` | 上下分割 |
+| `Ctrl-a h/j/k/l` | ペイン移動 |
+| `Ctrl-a z` | ズーム |
+| `Ctrl-a c` | 新規タブ |
+| `Ctrl-a n/p` | 次/前タブ |
+| `Ctrl-a 1..9` | 番号でタブ移動 |
+| `Ctrl-a Shift-r` | リサイズモード |
+| `Ctrl-a s` | fzf でワークスペース切替 |
+| `Ctrl-a S` | 現在パス名でワークスペース作成 |
+| `Ctrl-a q` | detach |
 
-### 標準的な更新フロー
+詳細は [docs/herdr.md](docs/herdr.md)。
 
-例: `gh` を新しいバージョンにしたい時。
+## Ghostty / zsh
 
-```sh
-# 1. nixpkgs を最新にする
-nix flake update nixpkgs
+- Ghostty は Home Manager で設定する。
+- Ghostty shell integration は Herdr 外でだけ読み込む。
+- Herdr 内では Powerlevel10k のマルチライン枠を無効化して表示崩れを避ける。
+- `fzf` は Home Manager の `programs.fzf.enableZshIntegration` で管理する。
+- `Ctrl-r` は zsh の `redisplay` ではなく `fzf-history-widget` に明示的に bind する。
 
-# 2. 適用して動作確認
-home-manager switch --flake '.#hiraoku.shinichi'
-gh --version
-
-# 3. flake.lock の変更を git にコミット → push → PR
-# (CLAUDE.md のワークフローに従う)
-```
-
-会社 PC は PR マージ後に `git pull && home-manager switch --flake '.#hiraoku.shinichi@PC-05481'` で同期。
-
-### 注意点
-
-- nixpkgs の `nixos-unstable` チャネルは数日に 1 回更新される。タイミングによっては「期待した最新版がまだ nixpkgs に入っていない」ことがある (例: 4/14 リビジョンに `gh 2.90.0`、4/18 リビジョンに `gh 2.89.0` のような前後)。
-- 更新後にバージョンが下がっていないか `--version` で必ず確認する。
-- 不具合があれば `flake.lock` を `git revert` して戻せる (詳細はトラブルシューティング節)。
-
-### 設定変更の適用
-
-`modules/` 内のファイルを編集した後:
+`Ctrl-r` が効かない時の確認:
 
 ```sh
-home-manager switch --flake '.#hiraoku.shinichi'
+bindkey '^R'
 ```
 
-## 拡張方法
+期待値:
 
-### パッケージを追加する
-
-`modules/common.nix` の `home.packages` にパッケージを追加:
-
-```nix
-home.packages = with pkgs; [
-  fzf
-  ripgrep
-  # ここに追加
-  jq
-  wget
-];
+```text
+"^R" fzf-history-widget
 ```
 
-パッケージは [Nix Packages Search](https://search.nixos.org/packages) で検索できる。
+## Neovim
 
-### プログラムの設定を追加する
+Neovim は `modules/nvim/` の Lua 設定を Home Manager で `~/.config/nvim` に配置する。
 
-`modules/common.nix` に `programs.<name>` ブロックを追加:
+主な方針:
 
-```nix
-programs.bat = {
-  enable = true;
-  config = {
-    theme = "TwoDark";
-  };
-};
-```
+- プラグインマネージャは lazy.nvim。
+- カラースキームは Kanagawa Wave。
+- Alpha dashboard のロゴは `ascii.nvim` の `art.text.neovim.sharp`。
+- lualine も Kanagawa に合わせる。
+- 画像表示は Ghostty の Kitty graphics protocol と ImageMagick を使う。
+- plugin lock は `modules/nvim-seeds/lazy-lock.json` を seed として管理する。
 
-対応プログラムは [Home Manager Options](https://nix-community.github.io/home-manager/options.xhtml) を参照。
-
-### 環境固有の設定を追加する
-
-設定の性質に応じて以下のいずれかに追加する:
-
-- **アカウント全体に効かせたい** (どの個人 PC でも使う、どの会社 PC でも使う等)
-  → `modules/accounts/personal.nix` または `modules/accounts/work.nix`
-- **特定マシン固有のもの** (この PC のディスク構成、ネットワーク証明書 等)
-  → `modules/hosts/<host-name>.nix`
-
-判断基準: **「マシンを買い替えてもこの値は変わるか？」** で振り分ける。
-変わらない (= 同じアカウントなら使い回したい) なら `accounts/`、変わるなら `hosts/`。
-
-### 新しい環境を追加する
-
-新しい個人 PC を買った場合 (例: `MacBook-Pro-2`):
-
-1. `modules/hosts/personal-mbp2.nix` を作成 (このマシン固有の差分のみ)
-2. `flake.nix` に 1 エントリ追加:
-
-```nix
-# flake.nix
-homeConfigurations = {
-  # 既存の構成 ...
-
-  "hiraoku.shinichi@MacBook-Pro-2" = mkHome [
-    ./modules/accounts/personal.nix    # 既存の個人アカウント設定をそのまま再利用
-    ./modules/hosts/personal-mbp2.nix  # 新規作成した host 設定
-  ];
-};
-```
-
-`mkHome` は `flake.nix` で定義済みのヘルパー関数。`./modules/common.nix` は自動で読み込まれる。
+詳細なキーバインド、LSP、フォーマット、プラグイン一覧は [docs/nvim.md](docs/nvim.md)。
 
 ### Neovim プラグインを追加する
 
-`modules/nvim/plugins/` に Lua ファイルを追加し、`modules/neovim.nix` に参照を追加:
+`modules/nvim/lua/plugins/` に lazy.nvim spec を追加する。
 
 ```lua
--- modules/nvim/plugins/example.lua
 return {
   "author/plugin-name",
   opts = {},
 }
 ```
 
-```nix
--- modules/neovim.nix に追加
-xdg.configFile."nvim/lua/plugins/example.lua".source = ./nvim/plugins/example.lua;
-```
+必要に応じて `home-manager switch` し、Neovim で `:Lazy sync` を実行する。lock をリポジトリに反映する場合は `~/.config/nvim/lazy-lock.json` を `modules/nvim-seeds/lazy-lock.json` にコピーしてコミットする。
 
-## Zsh プラグイン
+## Nix パッケージを更新する
 
-以下のプラグインは home-manager で Nix 管理している（Homebrew 不要）:
+Nix で管理しているツールのバージョンは `flake.lock` に固定された nixpkgs のリビジョンに紐づく。
 
-- **zsh-autosuggestions** — `programs.zsh.autosuggestion.enable` (`zsh.nix`)
-- **zsh-syntax-highlighting** — `programs.zsh.syntaxHighlighting.enable` (`zsh.nix`)
-- **Powerlevel10k** — `zsh-powerlevel10k` パッケージ (`common.nix`)
+| やりたいこと | コマンド |
+|---|---|
+| nixpkgs だけ更新 | `nix flake update nixpkgs` |
+| 全 input を更新 | `nix flake update` |
+| 設定を適用 | `home-manager switch --flake '.#hiraoku.shinichi'` |
 
-Powerlevel10k のプロンプト設定は `~/.p10k.zsh` で管理。変更したい場合は `p10k configure` を実行。
-
-## Neovim で画像ファイルを開く
-
-`snacks.image` を有効化しており、Neovim 内で画像を直接表示できる。
+標準フロー:
 
 ```sh
-nvim image.png
-nvim icon.svg
-nvim photo.jpg
+nix flake update nixpkgs
+home-manager switch --flake '.#hiraoku.shinichi'
+git diff
 ```
 
-### 対応フォーマット
+会社 PC での反映:
 
-PNG / JPG / JPEG / GIF / BMP / WebP / SVG / PDF（先頭ページのみ）
+```sh
+git pull --ff-only
+home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
+```
 
-SVG や PDF は ImageMagick で変換して表示するため、`common.nix` で `imagemagick` パッケージを Nix 管理している。
+注意:
 
-### 仕組み
+- nixpkgs の `nixos-unstable` は更新タイミングにより、特定ツールのバージョンが期待より古い場合がある。
+- 更新後は `--version` で必要なツールのバージョンを確認する。
+- 問題があれば `flake.lock` の変更コミットを `git revert` して戻せる。
 
-- `modules/nvim/plugins/snacks-image.lua` で `snacks.image` を有効化
-- Ghostty の Kitty graphics protocol を利用して表示
-- Markdown 内の画像参照（`![](path.png)`）もカーソルホバーで表示される
+## 秘密情報
 
-## 秘密情報の管理 (sops + age)
+秘密情報は sops + age で暗号化して Git 管理する。age の秘密鍵、復号済み secrets、証明書、API token はコミットしない。
 
-API キーなどの秘密情報は sops で暗号化して Git 管理している。
-
-### 初回セットアップ（新しい PC）
-
-age の鍵を生成:
+初回セットアップ:
 
 ```sh
 mkdir -p ~/.config/sops/age
 age-keygen -o ~/.config/sops/age/keys.txt
 ```
 
-表示された公開鍵を `.sops.yaml` に追加して、秘密情報を再暗号化:
+表示された age 公開鍵を `.sops.yaml` に追加し、既存 secrets を再暗号化する。
 
 ```sh
-# .sops.yaml に新しい公開鍵を追加した後
 sops updatekeys secrets/secrets.yaml
 ```
 
-### 秘密情報の追加・編集
+秘密情報の編集:
 
 ```sh
 sops secrets/secrets.yaml
 ```
 
-エディタが開くので、平文で編集して保存すると自動で暗号化される。
+仕組み:
 
-### 仕組み
+- `secrets/secrets.yaml`: sops で暗号化した secrets。Git 管理対象。
+- `~/.config/sops/age/keys.txt`: 復号用の秘密鍵。Git 管理外。
+- `load-secrets`: shell 起動時に `secrets/secrets.yaml` を復号し、環境変数として export する。
 
-- `secrets/secrets.yaml` — 暗号化された秘密情報（Git 管理）
-- `~/.config/sops/age/keys.txt` — 復号用の秘密鍵（Git 管理外）
-- `load-secrets` — シェル起動時に復号して環境変数に設定（secrets.yaml が存在する場合のみ実行）
+公開リポジトリとしての注意点は [docs/public-repo.md](docs/public-repo.md)。
 
-### エラー時の挙動
+## 拡張方法
 
-`load-secrets` は以下の場合、シェル起動時に警告を表示する:
+### 共通パッケージを追加する
 
-- `secrets/secrets.yaml` が存在しない
-- `sops` コマンドが見つからない
-- `~/.config/sops/age/keys.txt`（age の秘密鍵）が存在しない
-- 復号に失敗した（鍵の不一致など）
+`modules/common.nix` の `home.packages` に追加する。
+
+```nix
+home.packages = with pkgs; [
+  ripgrep
+  fd
+  jq
+];
+```
+
+パッケージは [Nix Packages Search](https://search.nixos.org/packages) で探す。
+
+### account 固有設定を追加する
+
+- 個人アカウント全体に効く設定: `modules/accounts/personal.nix`
+- 会社アカウント全体に効く設定: `modules/accounts/work.nix`
+
+### host 固有設定を追加する
+
+特定マシンだけで必要な設定は `modules/hosts/<host>.nix` に置く。
+
+新しい個人 PC を追加する例:
+
+```nix
+"hiraoku.shinichi@MacBook-Pro-2" = mkHome [
+  ./modules/accounts/personal.nix
+  ./modules/hosts/personal-mbp2.nix
+];
+```
 
 ## トラブルシューティング
 
 ### 既存の設定ファイルと衝突する
 
-home-manager が既存ファイルとの衝突を検知した場合、既存ファイルをバックアップしてから再実行する:
+Home Manager が既存ファイルとの衝突を検知した場合は、既存ファイルを退避してから再実行する。
 
 ```sh
 mv ~/.config/herdr/config.toml ~/.config/herdr/config.toml.bak
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
 
-### 前の状態に戻したい
-
-home-manager は世代管理をしている:
+### 前の Home Manager 世代に戻す
 
 ```sh
-# 世代の一覧
 home-manager generations
-
-# 前の世代に戻す
 /nix/var/nix/profiles/per-user/$USER/home-manager-<N>-link/activate
 ```
 
-または設定の変更を git で戻して再適用:
+設定変更自体を戻す場合:
 
 ```sh
 git revert HEAD
 home-manager switch --flake '.#hiraoku.shinichi'
 ```
 
-### nix flake update でツールのバージョンが下がった
+### Herdr の縦分割が効かない
 
-nixpkgs の更新タイミングによっては、特定パッケージのバージョンが直前のリビジョンより古いことがある。
-`flake.lock` の更新を git revert して元に戻す:
+`|` は端末や keyboard protocol によって `Shift-\` として届くことがある。設定では以下を同じ左右分割に割り当てている。
 
-```sh
-git log flake.lock      # 直近の flake.lock 更新コミットを確認
-git revert <commit>     # その更新を打ち消す
-home-manager switch --flake '.#hiraoku.shinichi'
-```
+- `Ctrl-a |`
+- `Ctrl-a Shift-\`
+- `Ctrl-a v`
+
+まず `Ctrl-a ?` で Herdr 側の実際のキーバインド表示を確認し、`Ctrl-a r` で設定を再読み込みする。
+
+### fzf の `Ctrl-r` が効かない
+
+`bindkey '^R'` が `"^R" redisplay` を返す場合、fzf の zsh integration が読み込まれていないか、後続設定で上書きされている。
+
+このリポジトリでは `modules/common.nix` と `modules/zsh/zshrc.sh` で `fzf-history-widget` を明示的に有効化している。反映後に新しい shell を開いて再確認する。
 
 ## 参考
 
-- [Nix入門 - asa1984](https://zenn.dev/asa1984/books/nix-introduction/viewer/01-introduction)
+- [Home Manager Manual](https://nix-community.github.io/home-manager/)
+- [Nix Packages Search](https://search.nixos.org/packages)
+- [NixOS options / Home Manager options](https://nix-community.github.io/home-manager/options.xhtml)

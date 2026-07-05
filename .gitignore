@@ -6,11 +6,24 @@
 # Editor
 *.swp
 .DS_Store
+.env
+.env.*
 
 # age private keys — never commit
 *.age-key
 keys.txt
+.config/sops/age/keys.txt
 
 # nix build outputs
 result
 result-*
+
+# Secrets, certificates, and decrypted files
+*.key
+*.pem
+*.p12
+*.pfx
+certs/
+secrets/*.dec.yaml
+secrets/*.plain.yaml
+secrets/*.decrypted.*

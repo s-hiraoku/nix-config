@@ -400,8 +400,11 @@ insert では `<C-_>`（= `^/`）で現在行トグル。
 ### 適用
 
 ```bash
+# 個人 MacBook
+home-manager switch --flake '.#hiraoku.shinichi'
+
 # 会社 PC
-nix run home-manager -- switch --flake '.#hiraoku.shinichi@PC-05481'
+home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
 `~/.config/nvim` は `modules/nvim/` を **recursive symlink** したもの（各ファイルが nix ストアへの読み取り専用 symlink）。ディレクトリ自体は実体なので lazy.nvim が `lazy-lock.json` を書き込める。設定更新のたびに `vim.loader` の luac キャッシュを破棄する activation が走る（nix ストアの mtime 固定でキャッシュが腐るのを防ぐ）。
