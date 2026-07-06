@@ -46,6 +46,7 @@
     ni  # antfu/ni: package manager auto-detect
     opencode
     wtp  # overlay 経由 (pkgs/wtp.nix)
+    hunk  # overlay 経由 (upstream flake, flake.nix 参照)
     librsvg
     colima
     ffmpeg

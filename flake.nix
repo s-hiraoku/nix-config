@@ -7,10 +7,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # hunk (https://www.hunk.dev/): レビュー向けターミナル diff ビューア。
+    # nixpkgs 未収録だが upstream 自身が flake を提供しているため、
+    # pkgs/ 配下に自前 derivation を書かずそのまま input として取り込む。
+    hunk.url = "github:modem-dev/hunk";
   };
 
   outputs =
-    { nixpkgs, home-manager, ... }:
+    { nixpkgs, home-manager, hunk, ... }:
     let
       system = "aarch64-darwin";
 
@@ -25,6 +29,7 @@
       overlays = [
         (final: prev: {
           wtp = final.callPackage ./pkgs/wtp.nix { };
+          hunk = hunk.packages.${system}.default;
         })
       ];
 
