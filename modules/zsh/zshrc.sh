@@ -21,7 +21,7 @@ fi
 # (罫線コーナーがプロンプト外の行に浮く症状)。$HERDR_PANE_ID が立つ herdr 内でのみ
 # 枠 (装飾) を無効化する。セグメント・powerline・アイコンは影響を受けない。
 # p10k はこれらのパラメータをプロンプト描画時に読むため source 後の上書きで有効。
-if [[ -n "$HERDR_PANE_ID" ]]; then
+if [[ -n "$HERDR_PANE_ID" || -n "$HERDR_ENV" ]]; then
   typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
   typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
   typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=''
@@ -201,10 +201,17 @@ _terminal_context_title() {
 
 _update_terminal_context_title() {
   [[ -z "$GHOSTTY_RESOURCES_DIR" ]] && return
+  # herdr 内では発行しない。GHOSTTY_RESOURCES_DIR は Ghostty から起動した
+  # herdr のペインにも継承されるが、タブタイトルは herdr が管理するうえ、
+  # 未終端 OSC が herdr の VT パーサに後続出力を食わせてプロンプトが
+  # ゴミ文字化する (会社環境で発生した症状)。
+  [[ -n "$HERDR_ENV" || -n "$HERDR_PANE_ID" ]] && return
 
   local title
   title=$(_terminal_context_title)
-  print -Pn "\e]0;${title}"
+  # OSC 0 は BEL (\a) で必ず終端する。終端が無いと端末が後続の出力を
+  # タイトル文字列として食い続け、プロンプトが崩れる。
+  print -Pn "\e]0;${title}\a"
 }
 
 chpwd_functions=(${chpwd_functions:#_update_terminal_context_title})
