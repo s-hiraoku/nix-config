@@ -29,8 +29,10 @@
   # キャッシュするが、nix ストアのファイルは mtime が常に固定 (1970) のため、
   # 設定を更新しても同サイズだと古いキャッシュが居座り変更が反映されない。
   # switch のたびに loader キャッシュを破棄して必ず新しい設定を読ませる。
+  # Neovim 起動中は削除と同時に新キャッシュが書き込まれ "Directory not empty"
+  # で失敗しうるため、best-effort にして activation 全体を止めない。
   home.activation.clearNvimLoaderCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    run rm -rf "${config.xdg.cacheHome}/nvim/luac"
+    run rm -rf "${config.xdg.cacheHome}/nvim/luac" || true
   '';
 
   # native spell のユーザー辞書 (zg/zw が追記する) は書き込み可能な場所に

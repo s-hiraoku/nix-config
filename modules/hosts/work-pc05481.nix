@@ -28,6 +28,15 @@ in
       unset NODE_EXTRA_CA_CERTS
     fi
 
+    # Nix の fixed-output derivation (builtins.fetchGit 等) は impureEnvVars
+    # 経由でシェルの NIX_SSL_CERT_FILE をそのまま引き継ぎ、nix.conf の
+    # ssl-cert-file (combinedCA) を無視する。デフォルトの nix profile CA bundle
+    # のままだと Cato の TLS インスペクションで GitHub 等への git fetch が
+    # 自己署名証明書エラーで失敗するため、combinedCA を明示的に指す。
+    if [[ -r "${combinedCA}" ]]; then
+      export NIX_SSL_CERT_FILE="${combinedCA}"
+    fi
+
     # 注意: --use-system-ca は NODE_OPTIONS では許可されておらず
     # (`node: --use-system-ca is not allowed in NODE_OPTIONS`)、設定すると
     # 全ての node 起動が失敗する。OS トラストストア参照が必要なら個別コマンドに

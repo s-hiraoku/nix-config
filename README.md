@@ -72,6 +72,40 @@ home-manager switch --flake '.#hiraoku.shinichi'
 home-manager switch --flake '.#hiraoku.shinichi@PC-05481'
 ```
 
+### 会社 PC 固有の追加設定 (Cato Networks TLS インスペクション対応)
+
+会社ネットワークは Cato Networks の TLS インスペクションを行っており、GitHub 等への
+HTTPS 通信に自己署名 (Cato Root CA) 証明書が挟まる。home-manager 側の `combinedCA`
+(`~/.local/share/nix-config/ca-bundle.pem`) や `NIX_SSL_CERT_FILE` の export だけでは、
+`builtins.fetchGit` などの fixed-output derivation が Cato 証明書を検証できず
+`SSL certificate ... self-signed certificate in certificate chain` で失敗する。
+
+理由: fixed-output derivation の `impureEnvVars` (`NIX_SSL_CERT_FILE` 等) は
+**呼び出し元シェルの環境変数ではなく nix-daemon プロセス自身の環境変数**から読まれるため。
+シェルで `export NIX_SSL_CERT_FILE=...` しても daemon には伝わらない。
+
+そのため、`/Library/LaunchDaemons/org.nixos.nix-daemon.plist` に daemon 自身の
+環境変数として `NIX_SSL_CERT_FILE` を設定する必要がある（home-manager では管理できない
+OS レベルの設定なので、新しい会社 PC ごとに手動で1回実行する）。
+
+```sh
+sudo cp /Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist.bak
+sudo /usr/libexec/PlistBuddy -c "Add :EnvironmentVariables dict" /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+sudo /usr/libexec/PlistBuddy -c "Add :EnvironmentVariables:NIX_SSL_CERT_FILE string /etc/ssl/nix-certs.pem" /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+
+# plist の再読込には bootout + bootstrap が必要
+# (launchctl kickstart -k はプロセス再起動のみで plist を再読込しない)
+sudo launchctl bootout system/org.nixos.nix-daemon
+sudo launchctl bootstrap system /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+
+# 反映確認: environment に NIX_SSL_CERT_FILE が出ること
+launchctl print system/org.nixos.nix-daemon | grep -A4 environment
+```
+
+`/etc/ssl/nix-certs.pem` に Cato Root CA が含まれていることが前提 (Cato のエージェント/
+IT 部門のセットアップで配置される)。含まれていない場合は Cato Root CA を追記した
+combined bundle を別途用意し、そのパスを指定する。
+
 ## 環境の切り替え
 
 同じ PC で環境を切り替えたい場合は、対応するコマンドを再実行するだけで切り替わる。
