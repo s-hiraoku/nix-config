@@ -129,17 +129,12 @@ end run
 APPLESCRIPT
 }
 
-# zoxide
-eval "$(zoxide init zsh)"
+# zoxide は programs.zoxide (common.nix)、ls/ll/la/lt は programs.eza が
+# alias を定義するため、ここでの手書き init/alias は廃止した。
 
 # Aliases
 alias yolo='claude --dangerously-skip-permissions'
 alias cat="bat"
-alias ls='eza --icons'
-unalias ll la 2>/dev/null
-ll() { eza -l -g --icons --git --header "${@:-.}"; }
-la() { eza -la -g --icons --git --header "${@:-.}"; }
-alias lt='eza --tree --level=2 --icons'
 
 # Terminal title context
 _codex_shorten_middle() {
@@ -221,10 +216,7 @@ precmd_functions+=(_update_terminal_context_title)
 
 DISABLE_AUTO_TITLE="true"
 
-# mise (runtime version manager)
-if command -v mise &>/dev/null; then
-  eval "$(mise activate zsh)"
-fi
+# mise の activate は programs.mise (common.nix) が行う。
 
 # Load encrypted secrets (sops + age) — 復号は環境ごとに 1 度だけ。
 # tmux / herdr のペインや子 shell は親の環境変数を継承しているので、
@@ -271,10 +263,14 @@ fi
 
 # Home Manager loads fzf's zsh integration before the custom init block, but in
 # some terminal/multiplexer startup paths ^R can remain zsh's default redisplay.
-# Re-source fzf late and make the history widget binding explicit.
+# Re-source fzf late. ^R の履歴検索は atuin (programs.atuin) が担うため、
+# atuin が無い環境でのみ fzf の history widget にフォールバックする。
+# (^T ファイル挿入 / ALT-C cd は引き続き fzf。)
 if [[ -o interactive ]] && command -v fzf >/dev/null 2>&1; then
   if ! zle -l | grep -qx 'fzf-history-widget'; then
     source <(fzf --zsh)
   fi
-  bindkey '^R' fzf-history-widget
+  if ! zle -l | grep -q 'atuin'; then
+    bindkey '^R' fzf-history-widget
+  fi
 fi
