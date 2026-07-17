@@ -22,6 +22,12 @@
     executable = true;
   };
 
+  # Claude Code statusline (settings.json の statusLine.command から参照される)
+  home.file.".claude/statusline.sh" = {
+    source = ./scripts/claude-statusline.py;
+    executable = true;
+  };
+
   home.packages = with pkgs; [
     ghq
     delta
