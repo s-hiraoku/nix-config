@@ -100,6 +100,20 @@
     enableZshIntegration = true;
   };
 
+  # mise は設定ファイルの信頼を「絶対パス単位」で ~/.local/state/mise に記録する。
+  # herdr のワークツリーは worktree-green-cloud-ed8b のようにランダムな名前で
+  # 毎回生成されるため、元のクローンを trust してあってもワークツリーは常に未信頼
+  # となり、mise.toml を持つ repo では起動のたびにエラーになる。ツリー全体を
+  # 信頼させることで都度の `mise trust` を不要にする。
+  #
+  # programs.mise.globalConfig.settings.trusted_config_paths ではなく環境変数を
+  # 使うのは、globalConfig を使うと ~/.config/mise/config.toml が nix store への
+  # 読み取り専用シンボリックリンクになり、docs/runtime-managers.md に書いた
+  # `mise use -g ...` の手順が使えなくなるため。
+  home.sessionVariables = {
+    MISE_TRUSTED_CONFIG_PATHS = "${config.home.homeDirectory}/.herdr/worktrees";
+  };
+
   # atuin: シェル履歴を SQLite 管理 (^R を置き換え)。
   # up-arrow は zsh デフォルトのまま残す。マシン間同期を使う場合は
   # `atuin register` / `atuin login` を手動で行う (secrets は同期しない)。
