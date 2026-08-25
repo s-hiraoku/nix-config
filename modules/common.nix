@@ -15,6 +15,15 @@
 
   home.shellAliases = {
     vim = "nvim";
+
+    # mise は設定ファイルの信頼を絶対パス単位で記録する。herdr のワークツリーは
+    # 毎回ランダムな名前で生成されるため、元のクローンを trust 済みでも
+    # ワークツリーは常に未信頼になり、mise.toml を持つ repo では入るたびに
+    # エラーが出る。これを打って明示的に信頼させる。
+    #
+    # MISE_TRUSTED_CONFIG_PATHS でツリーごと信頼させないのは意図的。
+    # 理由は docs/runtime-managers.md の「mise の trust について」を参照。
+    mt = "mise trust";
   };
 
   home.file.".local/bin/load-secrets" = {
