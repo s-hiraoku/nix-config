@@ -5,6 +5,21 @@
     enable = true;
     defaultEditor = true;
 
+    # Ruby / Python3 の remote plugin provider は使っていないため無効化する。
+    # home-manager はこれらのデフォルトを true から false へ変更したが、
+    # home.stateVersion が "26.05" 未満のうちは旧デフォルト (true) が使われ、
+    # switch のたびに移行を促す警告が出る。明示指定して警告を止めるとともに、
+    # stateVersion を上げたときに暗黙で挙動が変わるのを防ぐ。
+    #
+    # 無効化して安全な根拠: modules/nvim/ に provider 設定
+    # (python3_host_prog / ruby_host_prog / g:loaded_*_provider) は無く、
+    # lazy-lock.json の 43 プラグインはすべて Lua / Node 実装で pynvim にも
+    # neovim gem にも依存しない。ランタイム依存があるのは image.nvim の
+    # ImageMagick (common.nix の home.packages で供給) と
+    # markdown-preview.nvim の node / yarn のみ。
+    withRuby = false;
+    withPython3 = false;
+
     # nvim のラッパー PATH に追加するツール。treesitter の `:TSUpdate` /
     # auto_install と telescope-fzf-native の `make` はランタイムに C を
     # コンパイルするため、宣言的にコンパイラ・make を供給する
