@@ -23,7 +23,9 @@
       window-padding-color = "extend";
       macos-option-as-alt = "left";
       confirm-close-surface = true;
-      shell-integration-features = "no-title";
+      # ウィンドウタイトルに cwd と実行中コマンドを出す。ShiftLog はこのタイトルを
+      # そのまま作業記憶にするため、no-title だとターミナル作業が記録に残らない
+      shell-integration-features = "title";
       window-inherit-working-directory = true;
 
       # Quick Terminal
