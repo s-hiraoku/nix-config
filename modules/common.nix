@@ -31,6 +31,12 @@
     executable = true;
   };
 
+  # pstack /statechart の TLC を tla-ts に差し替える (settings.json の env.JAVA から参照される)
+  home.file.".local/bin/tla-ts-174" = {
+    source = ./scripts/tla-ts-174.sh;
+    executable = true;
+  };
+
   # Claude Code statusline (settings.json の statusLine.command から参照される)
   home.file.".claude/statusline.sh" = {
     source = ./scripts/claude-statusline.py;
